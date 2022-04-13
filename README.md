@@ -18,11 +18,18 @@
 
 ### ERD
 
-[resonar-erd.pdf](https://github.com/dlwndks9436/resonar-nodejs-server/files/8480235/resonar-erd.pdf)
+![악기 연습 데이터베이스 설계1-Page-1 drawio](https://user-images.githubusercontent.com/84265308/163153707-e63c0e8d-8334-47e7-91cb-b1197dc71446.png)
+![악기 연습 데이터베이스 설계1-Page-2 drawio](https://user-images.githubusercontent.com/84265308/163153715-73ec73be-0667-4828-be06-3bc27fa30046.png)
+
 
 ### db 명세
 
-[resonar db.pdf](https://github.com/dlwndks9436/resonar-nodejs-server/files/8480239/resonar.db.pdf)
+<img width="788" alt="image" src="https://user-images.githubusercontent.com/84265308/163154078-4679b33a-93a8-4079-8efb-b80a4b00dfa1.png">
+<img width="788" alt="image" src="https://user-images.githubusercontent.com/84265308/163154139-be88ca2f-d159-4bd3-8ab7-c7557b763c8c.png">
+<img width="788" alt="image" src="https://user-images.githubusercontent.com/84265308/163154188-240cd12c-a239-4341-a0c7-a32fb4dd3af0.png">
+<img width="785" alt="image" src="https://user-images.githubusercontent.com/84265308/163154238-c316c3f6-3aa2-4073-8de1-0bef00ed1158.png">
+<img width="784" alt="image" src="https://user-images.githubusercontent.com/84265308/163154279-b6c45104-4d39-4060-8d44-62511ac592d9.png">
+
 
 ### infrastructure
 
