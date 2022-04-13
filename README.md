@@ -4,7 +4,7 @@
 
 # resonar
 
-## 어플 체험해기
+## 어플 체험해보기
 
 https://play.google.com/store/apps/details?id=com.juann.resonar
 
