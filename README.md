@@ -37,9 +37,9 @@
 ## 구현한 기능
 
 * Mysql event scheduler를 이용해서 테이블 내 이래 조건에 해당되는 row 삭제
-** 유저가 회원가입한 이후 12 시간 이내에 이메일 인증하지 않을 경우
-** refresh token이 30일 동안 사용되지 않았을 경우
-** 인증코드 발급된지 5분이 지났을 때
+  * 유저가 회원가입한 이후 12 시간 이내에 이메일 인증하지 않을 경우
+  * refresh token이 30일 동안 사용되지 않았을 경우
+  * 인증코드 발급된지 5분이 지났을 때
 * 한글 텍스트 입력 및 조회가 가능하도록 sequelize.js와 aws rds 환경에 charset: utf8, collate: utf8_general_cli 적용
 * 삭제되는 데이터를 foreign key로 참조하는 row들이 삭제되도록 cascade 적용
 * https 통신이 가능하도록 route53와 acm을 이용해서 resonar.link 도메인 대여 후 ssl 적용
