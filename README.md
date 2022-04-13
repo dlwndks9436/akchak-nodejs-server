@@ -3,6 +3,11 @@
 ![resonar_graphic](https://user-images.githubusercontent.com/84265308/163145807-98371dba-4453-44e6-bced-f126387f2e07.png)
 
 # resonar
+
+## 어플 체험해기
+
+https://play.google.com/store/apps/details?id=com.juann.resonar
+
 ---------------------------------------------------------
 ### 프로젝트 계획 이유
 
