@@ -18,9 +18,8 @@
 
 ### ERD
 
-![악기 연습 데이터베이스 설계1-Page-1 drawio](https://user-images.githubusercontent.com/84265308/163153707-e63c0e8d-8334-47e7-91cb-b1197dc71446.png)
-![악기 연습 데이터베이스 설계1-Page-2 drawio](https://user-images.githubusercontent.com/84265308/163153715-73ec73be-0667-4828-be06-3bc27fa30046.png)
-
+![악기 연습 데이터베이스 설계1-Page-1 drawio](https://user-images.githubusercontent.com/84265308/163154584-c19701ce-15eb-4924-b146-76eacc5e7c2c.svg)
+![악기 연습 데이터베이스 설계1-Page-2 drawio](https://user-images.githubusercontent.com/84265308/163154598-a2283695-abca-47eb-b477-c04a2d736c53.svg)
 
 ### db 명세
 
