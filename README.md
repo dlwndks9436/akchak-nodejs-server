@@ -33,3 +33,25 @@
 ### infrastructure
 
 ![resonar infrastructure](https://user-images.githubusercontent.com/84265308/163152770-5963e180-5cdf-4b9a-b87e-277bad657a12.png)
+
+## 구현한 기능
+
+* Mysql event scheduler를 이용해서 테이블 내 이래 조건에 해당되는 row 삭제
+** 유저가 회원가입한 이후 12 시간 이내에 이메일 인증하지 않을 경우
+** refresh token이 30일 동안 사용되지 않았을 경우
+** 인증코드 발급된지 5분이 지났을 때
+* 한글 텍스트 입력 및 조회가 가능하도록 sequelize.js와 aws rds 환경에 charset: utf8, collate: utf8_general_cli 적용
+* 삭제되는 데이터를 foreign key로 참조하는 row들이 삭제되도록 cascade 적용
+* https 통신이 가능하도록 route53와 acm을 이용해서 resonar.link 도메인 대여 후 ssl 적용
+* resonar.link 도메인을 통해서 swagger docs를 조회할 수 있도록 swagger-jsdoc과 swagger-ui-express 사용
+* 회원가입할 때 유저가 입력한 이메일로 인증코드 보낼 수 있도록 nodemailer 사용
+* eb cli를 통해서 elastic beanstalk로 배포 환경 구축
+
+## 구현해야하는 기능
+* 덧글 model와 controller 추가
+* 유저 회원탈퇴 기능
+* practice model 수정
+
+## 프론트엔드 구경하기
+
+https://github.com/dlwndks9436/resonar-react-native-app
