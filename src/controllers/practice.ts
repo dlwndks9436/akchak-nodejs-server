@@ -18,7 +18,7 @@ export const createPractice = async (req: Request, res: Response) => {
     const practiceTime = req.body.practiceTime;
     const s3Key = req.body.s3Key;
 
-    await Practice.create({
+    const practice = await Practice.create({
       user_id: req.userId,
       title,
       description,
@@ -27,7 +27,9 @@ export const createPractice = async (req: Request, res: Response) => {
       practice_time: practiceTime,
       s3_key: s3Key,
     });
-
+    if (!practice) {
+      throw new Error("Could not create practice");
+    }
     res.status(StatusCodes.OK).end();
   } catch (err) {
     console.log(err);

@@ -5,7 +5,7 @@ import Rating from "../model/rating";
 
 export const getRating = async (req: Request, res: Response) => {
   try {
-    const result = await sequelize.transaction(async (t) => {
+    await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
       const rating = await Rating.findOrCreate({
         where: { user_id: req.userId, practice_id: practiceId },
@@ -24,7 +24,7 @@ export const getRating = async (req: Request, res: Response) => {
 
 export const changeRating = async (req: Request, res: Response) => {
   try {
-    const result = await sequelize.transaction(async (t) => {
+    await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
       const isLike = req.body.isLike;
       const rating = await Rating.update(
@@ -47,7 +47,7 @@ export const changeRating = async (req: Request, res: Response) => {
 
 export const countRatings = async (req: Request, res: Response) => {
   try {
-    const result = await sequelize.transaction(async (t) => {
+    await sequelize.transaction(async (t) => {
       const practiceIdStr = req.query.practiceId as string;
       const practiceId = parseInt(practiceIdStr, 10);
       console.log("practice id: ", practiceId);
