@@ -1,4 +1,4 @@
-import { sendMail } from "src/controllers/mailer";
+import { sendMail } from "src/lib/functions/sendMail";
 import AuthCode from "src/model/authCode";
 import makeAuthCode from "./makeAuthCode";
 
