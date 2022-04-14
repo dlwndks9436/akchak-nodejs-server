@@ -37,7 +37,7 @@ https://play.google.com/store/apps/details?id=com.juann.resonar
 
 ### infrastructure
 
-![resonar infrastructure](https://user-images.githubusercontent.com/84265308/163152770-5963e180-5cdf-4b9a-b87e-277bad657a12.png)
+![악기 연습 클라우드구조 설계 drawio](https://user-images.githubusercontent.com/84265308/163327411-db0a9180-13eb-489c-80a4-310973a37e10.svg)
 
 ## 구현한 기능
 
