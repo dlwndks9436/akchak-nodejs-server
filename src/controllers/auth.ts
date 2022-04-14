@@ -3,11 +3,9 @@ import User from "../model/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import AuthToken from "../model/token";
-import AuthCode from "../model/authCode";
-import makeAuthCode from "../lib/functions/makeAuthCode";
-import { sendMail } from "./mailer";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
+import { authCodeToEmail } from "src/lib/functions/authCodeToEmail";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -211,32 +209,4 @@ export const reissueAccessToken = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
   }
-};
-
-const authCodeToEmail = async (
-  userId: number,
-  userEmail: string
-): Promise<boolean> => {
-  const authCode = makeAuthCode(6);
-  try {
-    const previousAuthCode = await AuthCode.findOne({
-      where: { user_id: userId },
-    });
-    if (previousAuthCode) {
-      await previousAuthCode.update({ code: authCode }).then(async () => {
-        await sendMail(userEmail, authCode);
-      });
-    } else {
-      await AuthCode.create({
-        user_id: userId,
-        code: authCode,
-      }).then(async () => {
-        await sendMail(userEmail, authCode);
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-  return true;
 };
