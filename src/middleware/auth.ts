@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { UserInterface } from "../interfaces/AuthRequest";
 import User from "../model/user";
-import AuthCode from "../model/authCode";
+import AuthCode from "../model/verificationCode";
 import { StatusCodes } from "http-status-codes";
 import { body, validationResult } from "express-validator";
 

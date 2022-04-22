@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from ".";
-import AuthCode from "./authCode";
+import AuthCode from "./verificationCode";
 import Practice from "./practice";
-import Rating from "./rating";
-import AuthToken from "./token";
+import Rating from "./like";
+import AuthToken from "./jwtToken";
 
 /**
  * @swagger

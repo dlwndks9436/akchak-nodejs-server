@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../model/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import AuthToken from "../model/token";
+import AuthToken from "../model/jwtToken";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
 import { authCodeToEmail } from "src/lib/functions/authCodeToEmail";

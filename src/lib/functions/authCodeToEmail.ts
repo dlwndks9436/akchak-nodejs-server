@@ -1,5 +1,5 @@
 import { sendMail } from "src/lib/functions/sendMail";
-import AuthCode from "src/model/authCode";
+import AuthCode from "src/model/verificationCode";
 import makeAuthCode from "./makeAuthCode";
 
 export const authCodeToEmail = async (

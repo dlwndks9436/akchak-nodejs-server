@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
-import Rating from "../model/rating";
+import Rating from "../model/like";
 
 export const getRating = async (req: Request, res: Response) => {
   try {

@@ -11,10 +11,13 @@ export const sequelize = new Sequelize(
     host: dbConfig.HOST,
     dialect: dbConfig.dialect,
     pool: dbConfig.pool,
+    timezone: "+09:00",
     define: {
-      charset: "utf8",
-      collate: "utf8_general_ci",
+      charset: "utf8mb4",
+      collate: "utf8mb4_unicode_ci",
       timestamps: true,
+      underscored: true,
+      freezeTableName: true,
     },
   }
 );
