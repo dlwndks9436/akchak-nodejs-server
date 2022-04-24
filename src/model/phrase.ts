@@ -8,7 +8,7 @@ interface PhraseModelAttributes extends PhraseCreationAttributes {
 }
 
 interface PhraseCreationAttributes {
-  book: string;
+  book_id: number;
   title: string;
   subheading: string;
 }
@@ -18,31 +18,12 @@ export default class Phrase extends Model<
   PhraseCreationAttributes
 > {
   declare id: number;
-  declare book: number;
+  declare book_id: number;
   declare title: string;
   declare subheading: string;
   declare created_at: Date;
   declare updated_at: Date;
 }
-
-Phrase.belongsTo(Book, {
-  foreignKey: {
-    allowNull: false,
-    name: "book",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
-Phrase.hasMany(Goal, {
-  foreignKey: {
-    name: "phrase",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
 
 Phrase.init(
   {
@@ -54,7 +35,7 @@ Phrase.init(
       unique: true,
       comment: "교본 안에 있는 프레이즈의 고유번호",
     },
-    book: {
+    book_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       comment: "프레이즈가 속한 교본의 고유번호",

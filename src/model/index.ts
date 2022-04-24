@@ -1,16 +1,19 @@
-import dbConfig from "../config/database";
-import { Sequelize } from "sequelize";
-
-console.log(dbConfig.DB);
+import { Dialect, Sequelize } from "sequelize";
+import config from "../config/config";
 
 export const sequelize = new Sequelize(
-  dbConfig.DB,
-  dbConfig.USER,
-  dbConfig.PASSWORD,
+  config.database as string,
+  config.username as string,
+  config.password,
   {
-    host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
-    pool: dbConfig.pool,
+    host: config.host,
+    dialect: config.dialect as Dialect,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
     timezone: "+09:00",
     define: {
       charset: "utf8mb4",

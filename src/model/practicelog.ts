@@ -5,16 +5,17 @@ import Like from "./like";
 import Player from "./player";
 import Video from "./video";
 
-interface PracticeLogModelAttributes extends PracticeLogCreationAttributes {
+export interface PracticeLogModelAttributes
+  extends PracticeLogCreationAttributes {
   id: number;
+  view: number;
 }
 
 interface PracticeLogCreationAttributes {
-  goal: number;
-  player: number;
+  goal_id: number;
+  player_id: number;
   memo: string;
   time: number;
-  view: number;
   started_at: Date;
 }
 
@@ -23,8 +24,8 @@ export default class PracticeLog extends Model<
   PracticeLogCreationAttributes
 > {
   declare id: number;
-  declare goal: number;
-  declare player: number;
+  declare goal_id: number;
+  declare player_id: number;
   declare memo: string;
   declare time: number;
   declare view: number;
@@ -32,46 +33,6 @@ export default class PracticeLog extends Model<
   declare created_at: Date;
   declare updated_at: Date;
 }
-
-PracticeLog.belongsTo(Goal, {
-  foreignKey: {
-    allowNull: false,
-    name: "goal",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-PracticeLog.belongsTo(Player, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-PracticeLog.hasOne(Video, {
-  foreignKey: {
-    allowNull: false,
-    name: "practice_log",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-PracticeLog.hasMany(Like, {
-  foreignKey: {
-    allowNull: false,
-    name: "practice_log",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
 
 PracticeLog.init(
   {
@@ -83,7 +44,7 @@ PracticeLog.init(
       unique: true,
       comment: "연습 기록의 고유번호",
     },
-    goal: {
+    goal_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       comment: "연습 기록에 설정된 목표의 고유번호",
@@ -92,7 +53,7 @@ PracticeLog.init(
         key: "id",
       },
     },
-    player: {
+    player_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       comment: "연습 기록을 만든 연주자의 고유번호",

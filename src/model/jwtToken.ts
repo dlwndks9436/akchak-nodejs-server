@@ -19,7 +19,7 @@ import Player from "./player";
  */
 
 interface JWTTokenCreationAttributes {
-  player: number;
+  player_id: number;
   token: string;
 }
 
@@ -27,23 +27,13 @@ export default class JWTToken extends Model<
   JWTTokenCreationAttributes,
   JWTTokenCreationAttributes
 > {
-  declare player: number;
+  declare player_id: number;
   declare token: string;
 }
 
-JWTToken.belongsTo(Player, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
 JWTToken.init(
   {
-    player: {
+    player_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       primaryKey: true,
       unique: true,
@@ -69,9 +59,9 @@ JWTToken.init(
       afterCreate: async (token) => {
         const [results, metadata] = await sequelize.query(
           "CREATE EVENT destroy_jwt_token" +
-            token.player +
+            token.player_id +
             " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 30 DAY DO DELETE FROM jwt_token WHERE id = " +
-            token.player
+            token.player_id
         );
         console.log("results of jwt_token delete event: ", results);
         console.log("metadata of jwt_token delete event: ", metadata);
@@ -79,16 +69,16 @@ JWTToken.init(
       afterUpdate: async (token) => {
         const [results, metadata] = await sequelize.query(
           "ALTER EVENT destroy_jwt_token" +
-            token.player +
+            token.player_id +
             " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 30 DAY DO DELETE FROM jwt_token WHERE id = " +
-            token.player
+            token.player_id
         );
         console.log("results of jwt_token delete event: ", results);
         console.log("metadata of jwt_token delete event: ", metadata);
       },
       beforeDestroy: async (token) => {
         const [results, metadata] = await sequelize.query(
-          "DROP EVENT IF EXISTS destroy_jwt_token" + token.player
+          "DROP EVENT IF EXISTS destroy_jwt_token" + token.player_id
         );
         console.log("results of jwt_token delete event: ", results);
         console.log("metadata of jwt_token delete event: ", metadata);

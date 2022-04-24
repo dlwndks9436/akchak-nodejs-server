@@ -8,6 +8,6 @@ export interface RegisterData {
   email: string;
   password: string;
 }
-export interface UserInterface {
+export interface PlayerInterface {
   id: number;
 }

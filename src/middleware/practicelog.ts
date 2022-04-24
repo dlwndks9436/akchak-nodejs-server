@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 
-export const practiceValidator = async (
+export const practicelogCreateInputValidator = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -43,7 +43,7 @@ export const practiceValidator = async (
   next();
 };
 
-export const practiceUpdateValidator = async (
+export const practicelogUpdateInputValidator = async (
   req: Request,
   res: Response,
   next: NextFunction

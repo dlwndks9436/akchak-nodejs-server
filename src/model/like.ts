@@ -9,8 +9,8 @@ export interface LikeModelAttributes extends LikeCreationAttributes {
 }
 
 interface LikeCreationAttributes {
-  player: number;
-  practice_log: number;
+  player_id: number;
+  practice_log_id: number;
 }
 
 export default class Like extends Model<
@@ -18,30 +18,10 @@ export default class Like extends Model<
   LikeCreationAttributes
 > {
   declare id: number;
-  declare player: number;
-  declare practice_log: number;
+  declare player_id: number;
+  declare practice_log_id: number;
   declare is_like: boolean;
 }
-
-Like.belongsTo(PracticeLog, {
-  foreignKey: {
-    allowNull: false,
-    name: "practice_log",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Like.belongsTo(Player, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
 
 Like.init(
   {
@@ -53,7 +33,7 @@ Like.init(
       unique: true,
       comment: "좋아요의 고유번호",
     },
-    player: {
+    player_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       references: {
@@ -62,7 +42,7 @@ Like.init(
       },
       comment: "좋아요를 한 연주자",
     },
-    practice_log: {
+    practice_log_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       references: {

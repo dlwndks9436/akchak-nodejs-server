@@ -1,22 +1,26 @@
 import {
   verifyAccessToken,
   verifyRefreshToken,
-  verifyAuthCode,
+  verifyVerificationCode,
   checkDuplicatedUsername,
   checkDuplicatedEmail,
   loginValidator,
   signupValidator,
-} from "./auth";
+} from "./player";
 
-import { practiceValidator } from "./practice";
+import {
+  practicelogCreateInputValidator,
+  practicelogUpdateInputValidator,
+} from "./practicelog";
 
 export {
   checkDuplicatedEmail,
   checkDuplicatedUsername,
   verifyAccessToken,
   verifyRefreshToken,
-  verifyAuthCode,
+  verifyVerificationCode,
   loginValidator,
   signupValidator,
-  practiceValidator,
+  practicelogCreateInputValidator,
+  practicelogUpdateInputValidator,
 };

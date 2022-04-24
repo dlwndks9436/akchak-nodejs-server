@@ -1,4 +1,4 @@
-const makeAuthCode = (length: number): string => {
+const generateVerificationCode = (length: number): string => {
   let result = "";
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -9,4 +9,4 @@ const makeAuthCode = (length: number): string => {
   return result;
 };
 
-export default makeAuthCode;
+export default generateVerificationCode;

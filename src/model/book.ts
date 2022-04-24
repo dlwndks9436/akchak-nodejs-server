@@ -22,16 +22,6 @@ export default class Book extends Model<
   declare updated_at: Date;
 }
 
-Book.hasMany(Phrase, {
-  foreignKey: {
-    name: "book",
-    allowNull: false,
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
 Book.init(
   {
     id: {

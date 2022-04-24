@@ -1,15 +1,13 @@
 import { Router } from "express";
-import { authRouter } from "./auth";
-import { practiceRouter } from "./practice";
-import { userRouter } from "./user";
-import { ratingRouter } from "./rating";
+import { playerRouter } from "./player";
+import { practicelogRouter } from "./practicelog";
+import { likeRouter } from "./like";
 
 const router = Router();
 
 /* ROUTE */
-router.use("/auth", authRouter);
-router.use("/user", userRouter);
-router.use("/practice", practiceRouter);
-router.use("/rating", ratingRouter);
+router.use("/player", playerRouter);
+router.use("/practicelog", practicelogRouter);
+router.use("/like", likeRouter);
 
 export default router;

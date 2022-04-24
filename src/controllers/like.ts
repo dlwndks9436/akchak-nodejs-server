@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
-import Rating from "../model/like";
+import Like from "../model/like";
 
-export const getRating = async (req: Request, res: Response) => {
+export const getLike = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
-      const rating = await Rating.findOrCreate({
-        where: { user_id: req.userId, practice_id: practiceId },
+      const rating = await Like.findOrCreate({
+        where: { player_id: req.playerId, practice_log_id: practiceId },
         transaction: t,
       });
       if (!rating) {
@@ -22,15 +22,15 @@ export const getRating = async (req: Request, res: Response) => {
   }
 };
 
-export const changeRating = async (req: Request, res: Response) => {
+export const changeLike = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
       const isLike = req.body.isLike;
-      const rating = await Rating.update(
-        { isLike },
+      const rating = await Like.update(
+        { is_like: isLike },
         {
-          where: { user_id: req.userId, practice_id: practiceId },
+          where: { player_id: req.playerId, practice_log_id: practiceId },
           transaction: t,
         }
       );
@@ -45,7 +45,7 @@ export const changeRating = async (req: Request, res: Response) => {
   }
 };
 
-export const countRatings = async (req: Request, res: Response) => {
+export const countLikes = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const practiceIdStr = req.query.practiceId as string;
@@ -53,8 +53,8 @@ export const countRatings = async (req: Request, res: Response) => {
       console.log("practice id: ", practiceId);
       console.log("practice id string: ", practiceIdStr);
 
-      const count = await Rating.count({
-        where: { practice_id: practiceId, isLike: true },
+      const count = await Like.count({
+        where: { practice_log_id: practiceId, is_like: true },
         transaction: t,
       });
       console.log("count: ", count);

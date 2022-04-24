@@ -1,8 +1,8 @@
-import { FindAllAndCountPracticeResult } from "../../interfaces/Practice";
+import { FindAllAndCountPracticeLogResult } from "../../interface/Practice";
 import getSignedS3URL from "./getSignedS3URL";
 
 export const getPagingData = (
-  data: FindAllAndCountPracticeResult,
+  data: FindAllAndCountPracticeLogResult,
   page: string | undefined,
   limit: number
 ) => {
@@ -11,15 +11,16 @@ export const getPagingData = (
   const totalPages = Math.ceil(totalItems / limit);
   const thumbnailURLs = new Array<string>(practices.length);
   practices.forEach((practice, index) => {
-    const key = practice.s3_key
-      .split(".")
-      .map((val) => {
-        if (val === "mp4") {
-          return "jpg";
-        }
-        return val;
-      })
-      .join(".");
+    // const key = practice.s3_key
+    //   .split(".")
+    //   .map((val) => {
+    //     if (val === "mp4") {
+    //       return "jpg";
+    //     }
+    //     return val;
+    //   })
+    //   .join(".");
+    const key = "";
     const signedUrl = getSignedS3URL({
       bucket: process.env.BUCKET!,
       key,

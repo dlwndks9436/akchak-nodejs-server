@@ -1,15 +1,18 @@
 import { Router } from "express";
 import {
-  createPractice,
-  deletePractice,
-  getPracticeById,
-  getPractices,
-  updatePractice,
-} from "../controllers/practice";
-import { verifyAccessToken, practiceValidator } from "../middleware";
-import { practiceUpdateValidator } from "../middleware/practice";
+  createPracticelog,
+  deletePracticelog,
+  getPracticelogById,
+  getPracticelogs,
+  updatePracticelog,
+} from "../controllers/practicelog";
+import {
+  verifyAccessToken,
+  practicelogCreateInputValidator,
+  practicelogUpdateInputValidator,
+} from "../middleware";
 
-export const practiceRouter = Router();
+export const practicelogRouter = Router();
 /**
  * @swagger
  * /practice:
@@ -86,7 +89,12 @@ export const practiceRouter = Router();
  *        description: Given access token is not valid
  *
  */
-practiceRouter.post("/", verifyAccessToken, practiceValidator, createPractice);
+practicelogRouter.post(
+  "/",
+  verifyAccessToken,
+  practicelogCreateInputValidator,
+  createPracticelog
+);
 /**
  * @swagger
  * /practice/{id}:
@@ -151,7 +159,7 @@ practiceRouter.post("/", verifyAccessToken, practiceValidator, createPractice);
  *      404:
  *        description: Practice not found
  */
-practiceRouter.get("/:practiceId", verifyAccessToken, getPracticeById);
+practicelogRouter.get("/:practiceId", verifyAccessToken, getPracticelogById);
 /**
  * @swagger
  * /practice:
@@ -238,7 +246,7 @@ practiceRouter.get("/:practiceId", verifyAccessToken, getPracticeById);
  *      401:
  *        description: Given access token is not valid
  */
-practiceRouter.get("/", verifyAccessToken, getPractices);
+practicelogRouter.get("/", verifyAccessToken, getPracticelogs);
 /**
  * @swagger
  * /practice/{id}:
@@ -266,11 +274,11 @@ practiceRouter.get("/", verifyAccessToken, getPractices);
  *      404:
  *        description: Practice not found
  */
-practiceRouter.patch(
+practicelogRouter.patch(
   "/:practiceId",
   verifyAccessToken,
-  practiceUpdateValidator,
-  updatePractice
+  practicelogUpdateInputValidator,
+  updatePracticelog
 );
 /**
  * @swagger
@@ -297,4 +305,4 @@ practiceRouter.patch(
  *      404:
  *        description: Practice not found
  */
-practiceRouter.delete("/:practiceId", verifyAccessToken, deletePractice);
+practicelogRouter.delete("/:practiceId", verifyAccessToken, deletePracticelog);

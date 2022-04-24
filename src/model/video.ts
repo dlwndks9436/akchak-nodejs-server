@@ -7,7 +7,7 @@ interface VideoModelAttributes extends VideoCreationAttributes {
 }
 
 interface VideoCreationAttributes {
-  practice_log: number;
+  practice_log_id: number;
   s3_key: string;
   playback_time: number;
   file_size: number;
@@ -18,23 +18,13 @@ export default class Video extends Model<
   VideoCreationAttributes
 > {
   declare id: number;
-  declare practice_log: number;
+  declare practice_log_id: number;
   declare s3_key: string;
   declare playback_time: number;
   declare file_size: number;
   declare created_at: Date;
   declare updated_at: Date;
 }
-
-Video.belongsTo(PracticeLog, {
-  foreignKey: {
-    allowNull: false,
-    name: "practice_log",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
 
 Video.init(
   {
@@ -46,7 +36,7 @@ Video.init(
       unique: true,
       comment: "연주자가 녹화한 영상의 고유번호",
     },
-    practice_log: {
+    practice_log_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       unique: true,

@@ -11,10 +11,10 @@ interface GoalModelAttributes extends GoalCreationAttributes {
 }
 
 interface GoalCreationAttributes {
-  player: number;
-  phrase: number;
-  music: number;
-  subject: number;
+  player_id: number;
+  phrase_id: number;
+  music_id: number;
+  subject_id: number;
 }
 
 export default class Goal extends Model<
@@ -22,60 +22,13 @@ export default class Goal extends Model<
   GoalCreationAttributes
 > {
   declare id: number;
-  declare player: number;
-  declare phrase: number;
-  declare music: number;
-  declare subject: number;
+  declare player_id: number;
+  declare phrase_id: number;
+  declare music_id: number;
+  declare subject_id: number;
   declare created_at: Date;
   declare updated_at: Date;
 }
-
-Goal.belongsTo(Subject, {
-  foreignKey: {
-    name: "subject",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
-Goal.belongsTo(Music, {
-  foreignKey: {
-    name: "music",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
-Goal.belongsTo(Phrase, {
-  foreignKey: {
-    name: "phrase",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
-Goal.belongsTo(Player, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Goal.hasMany(PracticeLog, {
-  foreignKey: {
-    allowNull: false,
-    name: "goal",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
 
 Goal.init(
   {
@@ -87,7 +40,7 @@ Goal.init(
       unique: true,
       comment: "연습 목표의 고유번호",
     },
-    player: {
+    player_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       comment: "연습 목표를 만든 연주자의 고유번호",
@@ -96,7 +49,7 @@ Goal.init(
         key: "id",
       },
     },
-    phrase: {
+    phrase_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       comment: "연습 목표로 설정한 프레이즈의 고유번호",
       references: {
@@ -104,7 +57,7 @@ Goal.init(
         key: "id",
       },
     },
-    music: {
+    music_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       comment: "연습 목표로 설정한 음악의 고유번호",
       references: {
@@ -112,7 +65,7 @@ Goal.init(
         key: "id",
       },
     },
-    subject: {
+    subject_id: {
       type: DataTypes.SMALLINT.UNSIGNED,
       comment: "연습 목표로 설정한 주제의 고유번호",
       references: {

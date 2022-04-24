@@ -22,15 +22,6 @@ export default class Music extends Model<
   declare updated_at: Date;
 }
 
-Music.hasMany(Goal, {
-  foreignKey: {
-    name: "music",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
 Music.init(
   {
     id: {

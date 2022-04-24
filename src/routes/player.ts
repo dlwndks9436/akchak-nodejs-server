@@ -4,7 +4,7 @@ import {
   checkDuplicatedUsername,
   loginValidator,
   signupValidator,
-  verifyAuthCode,
+  verifyVerificationCode,
   verifyAccessToken,
   verifyRefreshToken,
 } from "../middleware";
@@ -14,10 +14,10 @@ import {
   issueAuthCode,
   signup,
   logout,
-} from "../controllers/auth";
-import { activateUser } from "../controllers/auth";
+} from "../controllers/player";
+import { activateUser, getPlayerInfo } from "../controllers/player";
 
-export const authRouter = Router();
+export const playerRouter = Router();
 /**
  * @swagger
  * /auth/signup:
@@ -79,7 +79,7 @@ export const authRouter = Router();
  *                param: "username"
  *                value: "username123"
  */
-authRouter.post(
+playerRouter.post(
   "/signup",
   signupValidator,
   checkDuplicatedEmail,
@@ -165,7 +165,7 @@ authRouter.post(
  *                  type: string
  *                  example: "The given email does not belong to any user"
  */
-authRouter.post("/login", loginValidator, login);
+playerRouter.post("/login", loginValidator, login);
 /**
  * @swagger
  * /auth/code:
@@ -212,7 +212,7 @@ authRouter.post("/login", loginValidator, login);
  *                  type: boolean
  *                  example: false
  */
-authRouter.get("/code", verifyAccessToken, issueAuthCode);
+playerRouter.get("/code", verifyAccessToken, issueAuthCode);
 /**
  * @swagger
  * /auth/activate-user:
@@ -266,10 +266,10 @@ authRouter.get("/code", verifyAccessToken, issueAuthCode);
  *                  type: string
  *                  example: "Given auth code is not valid"
  */
-authRouter.post(
+playerRouter.post(
   "/activate-user",
   verifyAccessToken,
-  verifyAuthCode,
+  verifyVerificationCode,
   activateUser
 );
 /**
@@ -311,7 +311,7 @@ authRouter.post(
  *                  type: string
  *                  example: "Given access token is not valid"
  */
-authRouter.patch("/token", verifyRefreshToken, reissueAccessToken);
+playerRouter.patch("/token", verifyRefreshToken, reissueAccessToken);
 /**
  * @swagger
  * /auth/token:
@@ -331,4 +331,43 @@ authRouter.patch("/token", verifyRefreshToken, reissueAccessToken);
  *      404:
  *        description: Given refresh token is verified but corresponding token does not exit in database
  */
-authRouter.delete("/token", verifyRefreshToken, logout);
+playerRouter.delete("/token", verifyRefreshToken, logout);
+
+/**
+ * @swagger
+ * /user/info:
+ *  get:
+ *    tags:
+ *    - User
+ *    summary: Get user's info
+ *    operationId: get user's info
+ *    security:
+ *    - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: Given access token is verified therefore provide user info
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: number
+ *                username:
+ *                  type: string
+ *                email:
+ *                  type: string
+ *                active:
+ *                  type: boolean
+ *                banned_until:
+ *                  type: object
+ *              example:
+ *                id: 3
+ *                username: 'username123'
+ *                email: "username@email-domain.com"
+ *                active: true
+ *                banned_until: null
+ *      401:
+ *       description: Given access token is not valid
+ */
+playerRouter.get("/info", verifyAccessToken, getPlayerInfo);

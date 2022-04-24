@@ -18,7 +18,7 @@ app.use(indexRouter);
 // Logic goes here
 
 app.get("/", (req, res) => {
-  res.send("Welcome to resonar api");
+  res.send("악착 api에 오신 것을 환영합니다!");
 });
 
 (async () => {
@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
       });
     })
     .catch((err) => {
-      console.log("Not able to connect to database");
+      console.log("데이터베이스 연결 실패");
       console.log(err);
     });
 })();

@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 
-export const sendMail = async (recipient: string, authCode: string) => {
+export const sendMail = async (recipient: string, verificationCode: string) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: 587,
+    port: parseInt(process.env.EMAIL_USERNAME as string),
     secure: false,
     auth: {
       user: process.env.EMAIL_USERNAME,
@@ -13,10 +13,10 @@ export const sendMail = async (recipient: string, authCode: string) => {
 
   await transporter.sendMail(
     {
-      from: "dlwndks9436@naver.com",
+      from: process.env.EMAIL_SENDER,
       to: recipient,
-      subject: "Welcome to Resonar!",
-      text: "The validation code is : " + authCode,
+      subject: "Welcome to Akchack!",
+      text: "The verification code is : " + verificationCode,
     },
     (err, info) => {
       console.log(info.envelope);

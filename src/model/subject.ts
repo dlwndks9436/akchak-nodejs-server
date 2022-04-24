@@ -18,15 +18,6 @@ export default class Subject extends Model<
   declare name: string;
 }
 
-Subject.hasMany(Goal, {
-  foreignKey: {
-    name: "subject",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
 Subject.init(
   {
     id: {

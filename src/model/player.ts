@@ -1,24 +1,28 @@
-import { bool } from "aws-sdk/clients/signer";
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from ".";
+import Book from "./book";
 import Goal from "./goal";
 import JWTToken from "./jwtToken";
 import Like from "./like";
+import Music from "./music";
+import Phrase from "./phrase";
 import PracticeLog from "./practicelog";
+import Subject from "./subject";
 import VerificationCode from "./verificationCode";
+import Video from "./video";
 
 interface PlayerModelAttributes extends PlayerCreationAttributes {
   id: number;
+  unregistered_at: Date;
+  banned_until: Date;
+  authorized: boolean;
+  profile_picture: string;
 }
 
 interface PlayerCreationAttributes {
   email: string;
   username: string;
   password: string;
-  authorized: boolean;
-  profile_picture: string;
-  unregistered_at: Date;
-  banned_until: Date;
 }
 
 export default class Player extends Model<
@@ -36,56 +40,6 @@ export default class Player extends Model<
   declare created_at: Date;
   declare updated_at: Date;
 }
-
-Player.hasMany(Like, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Player.hasMany(PracticeLog, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Player.hasMany(Goal, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Player.hasOne(VerificationCode, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
-Player.hasOne(JWTToken, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
 
 Player.init(
   {
@@ -139,3 +93,237 @@ Player.init(
     sequelize,
   }
 );
+
+Book.hasMany(Phrase, {
+  foreignKey: {
+    name: "book_id",
+    allowNull: false,
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Goal.belongsTo(Subject, {
+  foreignKey: {
+    name: "subject_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Goal.belongsTo(Music, {
+  foreignKey: {
+    name: "music_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Goal.belongsTo(Phrase, {
+  foreignKey: {
+    name: "phrase_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Goal.belongsTo(Player, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Goal.hasMany(PracticeLog, {
+  foreignKey: {
+    allowNull: false,
+    name: "goal_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+JWTToken.belongsTo(Player, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Like.belongsTo(PracticeLog, {
+  foreignKey: {
+    allowNull: false,
+    name: "practice_log_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Like.belongsTo(Player, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Music.hasMany(Goal, {
+  foreignKey: {
+    name: "music_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Phrase.belongsTo(Book, {
+  foreignKey: {
+    allowNull: false,
+    name: "book_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Phrase.hasMany(Goal, {
+  foreignKey: {
+    name: "phrase_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+Player.hasMany(Like, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Player.hasMany(PracticeLog, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Player.hasMany(Goal, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Player.hasOne(VerificationCode, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Player.hasOne(JWTToken, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+PracticeLog.belongsTo(Goal, {
+  foreignKey: {
+    allowNull: false,
+    name: "goal_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+PracticeLog.belongsTo(Player, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+PracticeLog.hasOne(Video, {
+  foreignKey: {
+    allowNull: false,
+    name: "practice_log_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+PracticeLog.hasMany(Like, {
+  foreignKey: {
+    allowNull: false,
+    name: "practice_log_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Subject.hasMany(Goal, {
+  foreignKey: {
+    name: "subject_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "RESTRICT",
+});
+
+VerificationCode.belongsTo(Player, {
+  foreignKey: {
+    allowNull: false,
+    name: "player_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});
+
+Video.belongsTo(PracticeLog, {
+  foreignKey: {
+    allowNull: false,
+    name: "practice_log_id",
+  },
+  constraints: true,
+  onUpdate: "CASCADE",
+  onDelete: "CASCADE",
+});

@@ -3,7 +3,7 @@ import { sequelize } from ".";
 import Player from "./player";
 
 interface VerificationCodeCreationAttributes {
-  player: number;
+  player_id: number;
   code: string;
 }
 
@@ -11,23 +11,13 @@ export default class VerificationCode extends Model<
   VerificationCodeCreationAttributes,
   VerificationCodeCreationAttributes
 > {
-  declare player: number;
+  declare player_id: number;
   declare code: string;
 }
 
-VerificationCode.belongsTo(Player, {
-  foreignKey: {
-    allowNull: false,
-    name: "player",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "CASCADE",
-});
-
 VerificationCode.init(
   {
-    player: {
+    player_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       primaryKey: true,
@@ -52,9 +42,9 @@ VerificationCode.init(
       afterCreate: async (code) => {
         const [results, metadata] = await sequelize.query(
           "CREATE EVENT destroy_verification_code" +
-            code.player +
+            code.player_id +
             " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 5 MINUTE DO DELETE FROM verification_code WHERE id = " +
-            code.player
+            code.player_id
         );
         console.log("results of code delete event: ", results);
         console.log("metadata of code delete event: ", metadata);
@@ -62,16 +52,16 @@ VerificationCode.init(
       afterUpdate: async (code) => {
         const [results, metadata] = await sequelize.query(
           "ALTER EVENT destroy_verification_code" +
-            code.player +
+            code.player_id +
             " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 5 MINUTE DO DELETE FROM verification_code WHERE id = " +
-            code.player
+            code.player_id
         );
         console.log("results of code delete event: ", results);
         console.log("metadata of code delete event: ", metadata);
       },
       beforeDestroy: async (code) => {
         const [results, metadata] = await sequelize.query(
-          "DROP EVENT IF EXISTS destroy_verification_code" + code.player
+          "DROP EVENT IF EXISTS destroy_verification_code" + code.player_id
         );
         console.log("results of code delete event: ", results);
         console.log("metadata of code delete event: ", metadata);

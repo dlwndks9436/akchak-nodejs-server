@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { UserInterface } from "../interfaces/AuthRequest";
-import User from "../model/user";
-import AuthCode from "../model/verificationCode";
+import { PlayerInterface } from "../interface/AuthRequest";
+import Player from "../model/player";
+import VerificationCode from "../model/verificationCode";
 import { StatusCodes } from "http-status-codes";
 import { body, validationResult } from "express-validator";
 
@@ -33,7 +33,7 @@ export const verifyAccessToken = (
           .send({ message: "Given access token is not valid", expired: false });
       }
     }
-    req.userId = (decoded as UserInterface).id;
+    req.playerId = (decoded as PlayerInterface).id;
     next();
   });
 };
@@ -43,7 +43,6 @@ export const verifyRefreshToken = (
   res: Response,
   next: NextFunction
 ) => {
-  // const token = req.headers["x-refresh-token"] as string | undefined;
   const bearerHeader = req.headers["authorization"];
   if (!bearerHeader) {
     return res
@@ -58,23 +57,23 @@ export const verifyRefreshToken = (
         .status(StatusCodes.UNAUTHORIZED)
         .send({ message: "Invalid token provided" });
     }
-    req.userId = (decoded as UserInterface).id;
+    req.playerId = (decoded as PlayerInterface).id;
     req.token = bearerToken;
     next();
   });
 };
 
-export const verifyAuthCode = async (
+export const verifyVerificationCode = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const authCode = req.body.authCode;
-  if (!authCode)
+  const verificationCode = req.body.authCode;
+  if (!verificationCode)
     return res
       .status(StatusCodes.FORBIDDEN)
-      .send({ message: "Given auth code is not valid" });
-  await AuthCode.findOne({ where: { user_id: req.userId } })
+      .send({ message: "Given verification code is not valid" });
+  await VerificationCode.findOne({ where: { player_id: req.playerId } })
     .then(async (code) => {
       if (code) {
         await code.destroy({ hooks: true });
@@ -82,7 +81,7 @@ export const verifyAuthCode = async (
       } else {
         return res
           .status(StatusCodes.FORBIDDEN)
-          .send({ message: "Given auth code is not valid" });
+          .send({ message: "Given verification code is not valid" });
       }
     })
     .catch((err: Error) => {
@@ -97,7 +96,7 @@ export const checkDuplicatedUsername = (
   res: Response,
   next: NextFunction
 ) => {
-  User.findOne({
+  Player.findOne({
     where: {
       username: req.body.username,
     },
@@ -125,7 +124,7 @@ export const checkDuplicatedEmail = (
   res: Response,
   next: NextFunction
 ) => {
-  User.findOne({
+  Player.findOne({
     where: {
       email: req.body.email,
     },

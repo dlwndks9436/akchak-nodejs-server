@@ -1,6 +1,6 @@
 declare namespace Express {
   interface Request {
-    userId: number;
+    playerId: number;
     token: string;
   }
 }

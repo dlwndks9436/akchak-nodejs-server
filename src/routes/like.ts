@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { changeRating, countRatings, getRating } from "../controllers/rating";
+import { changeLike, countLikes, getLike } from "../controllers/like";
 import { verifyAccessToken } from "../middleware";
 
-export const ratingRouter = Router();
+export const likeRouter = Router();
 /**
  * @swagger
  * /rating/number:
@@ -28,7 +28,7 @@ export const ratingRouter = Router();
  *    404:
  *     description: Practice not found
  */
-ratingRouter.get("/number", verifyAccessToken, countRatings);
+likeRouter.get("/number", verifyAccessToken, countLikes);
 /**
  * @swagger
  * /rating/{id}:
@@ -54,7 +54,7 @@ ratingRouter.get("/number", verifyAccessToken, countRatings);
  *    404:
  *     description: Practice not found
  */
-ratingRouter.get("/:practiceId", verifyAccessToken, getRating);
+likeRouter.get("/:practiceId", verifyAccessToken, getLike);
 /**
  * @swagger
  * /rating/{id}:
@@ -80,4 +80,4 @@ ratingRouter.get("/:practiceId", verifyAccessToken, getRating);
  *    404:
  *     description: Practice not found
  */
-ratingRouter.patch("/:practiceId", verifyAccessToken, changeRating);
+likeRouter.patch("/:practiceId", verifyAccessToken, changeLike);
