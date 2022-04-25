@@ -24,7 +24,8 @@ app.get("/", (req, res) => {
 (async () => {
   await sequelize
     .sync()
-    .then(() => {
+    .then(async () => {
+      await sequelize.query("SET GLOBAL event_scheduler = ON");
       const port = process.env.PORT || "30000";
       app.listen(port, () => {
         console.log(`Server running on port ${port}`);

@@ -90,6 +90,25 @@ Player.init(
   {
     modelName: "player",
     initialAutoIncrement: "1",
+    hooks: {
+      afterCreate: async (user) => {
+        const [results, metadata] = await sequelize.query(
+          "CREATE EVENT clearPlayer" +
+            user.id +
+            " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 12 HOUR DO DELETE FROM player WHERE id = " +
+            user.id
+        );
+        console.log("results of user delete event: ", results);
+        console.log("metadata of user delete event: ", metadata);
+      },
+      afterDestroy: async (user) => {
+        const [results, metadata] = await sequelize.query(
+          "DROP EVENT IF EXISTS clearPlayer" + user.id
+        );
+        console.log("results of user delete event: ", results);
+        console.log("metadata of user delete event: ", metadata);
+      },
+    },
     sequelize,
   }
 );

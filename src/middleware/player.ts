@@ -68,15 +68,15 @@ export const verifyVerificationCode = async (
   res: Response,
   next: NextFunction
 ) => {
-  const verificationCode = req.body.authCode;
+  const verificationCode = req.body.code;
   if (!verificationCode)
     return res
       .status(StatusCodes.FORBIDDEN)
-      .send({ message: "Given verification code is not valid" });
+      .send({ message: "인증코드가 확인되지 않았습니다" });
   await VerificationCode.findOne({ where: { player_id: req.playerId } })
     .then(async (code) => {
-      if (code) {
-        await code.destroy({ hooks: true });
+      if (code?.code === verificationCode) {
+        await code!.destroy({ hooks: true });
         next();
       } else {
         return res
@@ -192,6 +192,26 @@ export const loginValidator = async (
     .withMessage("invalid email form")
     .normalizeEmail()
     .run(req);
+  await body("password", "Invalid password")
+    .notEmpty()
+    .withMessage("password is empty")
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
+    .withMessage("password does not meet requirements")
+    .run(req);
+  const result = validationResult(req);
+  console.log("result: ", result);
+
+  if (!result.isEmpty()) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ errors: result.array() });
+  }
+  next();
+};
+
+export const passwordValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   await body("password", "Invalid password")
     .notEmpty()
     .withMessage("password is empty")

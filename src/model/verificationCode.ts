@@ -43,7 +43,7 @@ VerificationCode.init(
         const [results, metadata] = await sequelize.query(
           "CREATE EVENT destroy_verification_code" +
             code.player_id +
-            " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 5 MINUTE DO DELETE FROM verification_code WHERE id = " +
+            " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 310 SECOND DO DELETE FROM verification_code WHERE player_id = " +
             code.player_id
         );
         console.log("results of code delete event: ", results);
@@ -53,7 +53,7 @@ VerificationCode.init(
         const [results, metadata] = await sequelize.query(
           "ALTER EVENT destroy_verification_code" +
             code.player_id +
-            " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 5 MINUTE DO DELETE FROM verification_code WHERE id = " +
+            " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 310 SECOND DO DELETE FROM verification_code WHERE player_id = " +
             code.player_id
         );
         console.log("results of code delete event: ", results);

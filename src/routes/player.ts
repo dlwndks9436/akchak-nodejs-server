@@ -11,11 +11,15 @@ import {
 import {
   login,
   reissueAccessToken,
-  issueAuthCode,
+  issueVerificationCode,
   signup,
   logout,
+  checkVerificationCode,
+  changePassword,
+  authorizeUser,
+  getPlayerInfo,
 } from "../controllers/player";
-import { activateUser, getPlayerInfo } from "../controllers/player";
+import { passwordValidator } from "../middleware/player";
 
 export const playerRouter = Router();
 /**
@@ -212,7 +216,9 @@ playerRouter.post("/login", loginValidator, login);
  *                  type: boolean
  *                  example: false
  */
-playerRouter.get("/code", verifyAccessToken, issueAuthCode);
+playerRouter.post("/verification-code", issueVerificationCode);
+
+playerRouter.get("/verification-code", checkVerificationCode);
 /**
  * @swagger
  * /auth/activate-user:
@@ -266,11 +272,11 @@ playerRouter.get("/code", verifyAccessToken, issueAuthCode);
  *                  type: string
  *                  example: "Given auth code is not valid"
  */
-playerRouter.post(
-  "/activate-user",
+playerRouter.patch(
+  "/authorized",
   verifyAccessToken,
   verifyVerificationCode,
-  activateUser
+  authorizeUser
 );
 /**
  * @swagger
@@ -371,3 +377,5 @@ playerRouter.delete("/token", verifyRefreshToken, logout);
  *       description: Given access token is not valid
  */
 playerRouter.get("/info", verifyAccessToken, getPlayerInfo);
+
+playerRouter.patch("/password", passwordValidator, changePassword);

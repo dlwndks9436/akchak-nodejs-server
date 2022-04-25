@@ -6,6 +6,7 @@ import JWTToken from "../model/jwtToken";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
 import { verificationCodeToEmail } from "../lib/functions/verificationCodeToEmail";
+import VerificationCode from "../model/verificationCode";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -68,15 +69,11 @@ export const login = async (req: Request, res: Response) => {
           expiresIn: process.env.EXPIRATION_OF_REFRESH_TOKEN,
         }
       );
-
-      const authToken = await JWTToken.create(
-        {
-          player_id: player.id,
-          token: refreshToken,
-        },
-        { transaction: t }
-      );
-      if (authToken) {
+      const previousToken = await JWTToken.findOne({
+        where: { player_id: player.id },
+      });
+      if (previousToken) {
+        await previousToken.update({ token: refreshToken }, { transaction: t });
         res.status(StatusCodes.OK).send({
           accessToken,
           refreshToken,
@@ -86,6 +83,25 @@ export const login = async (req: Request, res: Response) => {
           authorized: player.authorized,
           banned_until: player.banned_until,
         });
+      } else {
+        const jwtToken = await JWTToken.create(
+          {
+            player_id: player.id,
+            token: refreshToken,
+          },
+          { transaction: t }
+        );
+        if (jwtToken) {
+          res.status(StatusCodes.OK).send({
+            accessToken,
+            refreshToken,
+            id: player.id,
+            username: player.username,
+            email: player.email,
+            authorized: player.authorized,
+            banned_until: player.banned_until,
+          });
+        }
       }
     });
   } catch (err) {
@@ -116,11 +132,11 @@ export const logout = async (req: Request, res: Response) => {
   }
 };
 
-export const issueAuthCode = async (req: Request, res: Response) => {
+export const issueVerificationCode = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const player = await Player.findOne({
-        where: { id: req.playerId },
+        where: { email: req.body.email },
         transaction: t,
       });
       if (player) {
@@ -128,14 +144,14 @@ export const issueAuthCode = async (req: Request, res: Response) => {
         if (result) {
           res
             .status(StatusCodes.OK)
-            .send({ message: "Auth code sent to player's email" });
+            .send({ message: "사용자 이메일로 인증코드 전송됨" });
         } else {
-          throw new Error("Error occured during email sending process");
+          throw new Error("인증 코드 전송 과정 중에 에러 발생함");
         }
       } else {
         res
           .status(StatusCodes.BAD_REQUEST)
-          .send({ message: "Invalid access." });
+          .send({ message: "권한이 없습니다" });
       }
     });
   } catch (err) {
@@ -144,7 +160,41 @@ export const issueAuthCode = async (req: Request, res: Response) => {
   }
 };
 
-export const activateUser = async (req: Request, res: Response) => {
+export const checkVerificationCode = async (req: Request, res: Response) => {
+  try {
+    const player = await Player.findOne({
+      where: { email: req.query.email as string },
+      raw: true,
+    });
+    if (player) {
+      const code = await VerificationCode.findOne({
+        where: { player_id: player.id },
+      });
+      if (code) {
+        if (code.code === req.query.code) {
+          await sequelize.query(
+            "ALTER EVENT destroy_verification_code" +
+              code.player_id +
+              " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 HOUR DO DELETE FROM verification_code WHERE player_id = " +
+              code.player_id
+          );
+          res.status(StatusCodes.OK).end();
+        } else {
+          res.status(StatusCodes.CONFLICT).end();
+        }
+      } else {
+        res.status(StatusCodes.NOT_FOUND).end();
+      }
+    } else {
+      res.status(StatusCodes.UNAUTHORIZED).end();
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: err });
+  }
+};
+
+export const authorizeUser = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       await sequelize
@@ -157,11 +207,9 @@ export const activateUser = async (req: Request, res: Response) => {
             { where: { id: req.playerId }, transaction: t }
           );
           if (player) {
-            res
-              .status(StatusCodes.OK)
-              .send({ message: "Player email successfully authenticated" });
+            res.status(StatusCodes.OK).send({ message: "이메일 인증 성공" });
           } else {
-            throw new Error("Player does not exist");
+            throw new Error("유효하지 않는 접근입니다");
           }
         });
     });
@@ -223,5 +271,37 @@ export const getPlayerInfo = async (req: Request, res: Response) => {
     });
   } else {
     res.status(StatusCodes.UNAUTHORIZED).end();
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    await sequelize.transaction(async (t) => {
+      const { email, code, password } = req.body;
+      const player = await Player.findOne({ where: { email } });
+      if (!player) {
+        res.status(StatusCodes.UNAUTHORIZED).end();
+      } else {
+        const verificationCode = await VerificationCode.findOne({
+          where: { player_id: player?.id },
+        });
+        if (!verificationCode) {
+          res.status(StatusCodes.NOT_FOUND).end();
+        } else if (verificationCode?.code !== code) {
+          res.status(StatusCodes.UNAUTHORIZED).end();
+        } else if (bcrypt.compareSync(password, player?.password as string)) {
+          res.status(StatusCodes.CONFLICT).end();
+        } else {
+          await player.update(
+            { password: bcrypt.hashSync(password) },
+            { transaction: t }
+          );
+          await verificationCode.destroy({ transaction: t });
+          res.status(StatusCodes.OK).end();
+        }
+      }
+    });
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
   }
 };

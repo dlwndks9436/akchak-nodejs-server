@@ -12,18 +12,18 @@ export const verificationCodeToEmail = async (
       where: { player_id: playerId },
     });
     if (previousVerificationCode) {
-      await previousVerificationCode
-        .update({ code: verificationCode })
-        .then(async () => {
-          await sendMail(playerEmail, verificationCode);
-        });
+      await previousVerificationCode.update({ code: verificationCode });
+      // .then(async () => {
+      //   await sendMail(playerEmail, verificationCode);
+      // });
     } else {
       await VerificationCode.create({
         player_id: playerId,
         code: verificationCode,
-      }).then(async () => {
-        await sendMail(playerEmail, verificationCode);
       });
+      // .then(async () => {
+      //   await sendMail(playerEmail, verificationCode);
+      // });
     }
   } catch (err) {
     console.log(err);
