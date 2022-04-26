@@ -1,26 +1,27 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Player from "./player";
 import PracticeLog from "./practicelog";
 
-export interface LikeModelAttributes extends LikeCreationAttributes {
-  id: number;
-  is_like: boolean;
-}
-
-interface LikeCreationAttributes {
-  player_id: number;
-  practice_log_id: number;
-}
-
 export default class Like extends Model<
-  LikeModelAttributes,
-  LikeCreationAttributes
+  InferAttributes<Like>,
+  InferCreationAttributes<Like>
 > {
-  declare id: number;
-  declare player_id: number;
-  declare practice_log_id: number;
-  declare is_like: boolean;
+  declare id: CreationOptional<number>;
+  declare player_id: ForeignKey<Player["id"]>;
+  declare practice_log_id: ForeignKey<PracticeLog["id"]>;
+  declare is_like: CreationOptional<boolean>;
+
+  declare player?: NonAttribute<Player>;
+  declare practice_log?: NonAttribute<PracticeLog>;
 }
 
 Like.init(
@@ -32,24 +33,6 @@ Like.init(
       allowNull: false,
       unique: true,
       comment: "좋아요의 고유번호",
-    },
-    player_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: Player,
-        key: "id",
-      },
-      comment: "좋아요를 한 연주자",
-    },
-    practice_log_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: PracticeLog,
-        key: "id",
-      },
-      comment: "좋아요를 받은 연습기록",
     },
     is_like: {
       type: DataTypes.BOOLEAN,

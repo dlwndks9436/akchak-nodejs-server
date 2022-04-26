@@ -198,7 +198,7 @@ export const authorizeUser = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       await sequelize
-        .query("DROP EVENT IF EXISTS clearUser" + req.playerId, {
+        .query("DROP EVENT IF EXISTS clearPlayer" + req.playerId, {
           transaction: t,
         })
         .then(async () => {

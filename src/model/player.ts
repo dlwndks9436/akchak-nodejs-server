@@ -1,4 +1,12 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Book from "./book";
 import Goal from "./goal";
@@ -11,34 +19,34 @@ import Subject from "./subject";
 import VerificationCode from "./verificationCode";
 import Video from "./video";
 
-interface PlayerModelAttributes extends PlayerCreationAttributes {
-  id: number;
-  unregistered_at: Date;
-  banned_until: Date;
-  authorized: boolean;
-  profile_picture: string;
-}
-
-interface PlayerCreationAttributes {
-  email: string;
-  username: string;
-  password: string;
-}
-
 export default class Player extends Model<
-  PlayerModelAttributes,
-  PlayerCreationAttributes
+  InferAttributes<Player>,
+  InferCreationAttributes<Player>
 > {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare email: string;
   declare username: string;
   declare password: string;
-  declare authorized: boolean;
-  declare profile_picture: string;
-  declare unregistered_at: Date;
-  declare banned_until: Date;
-  declare created_at: Date;
-  declare updated_at: Date;
+  declare authorized: CreationOptional<boolean>;
+  declare profile_picture: CreationOptional<string | null>;
+  declare unregistered_at: CreationOptional<Date | null>;
+  declare banned_until: CreationOptional<Date | null>;
+  declare created_at: CreationOptional<Date>;
+  declare updated_at: CreationOptional<Date>;
+
+  declare likes?: NonAttribute<Like[]>;
+  declare practice_logs?: NonAttribute<PracticeLog[]>;
+  declare goals?: NonAttribute<Goal[]>;
+  declare verification_code?: NonAttribute<VerificationCode>;
+  declare jwt_token?: NonAttribute<JWTToken>;
+
+  declare static associations: {
+    likes: Association<Player, Like>;
+    practice_logs: Association<Player, PracticeLog>;
+    goals: Association<Player, Goal>;
+    verification_code: Association<Player, VerificationCode>;
+    jwt_token: Association<Player, JWTToken>;
+  };
 }
 
 Player.init(
@@ -69,7 +77,7 @@ Player.init(
       comment: "연주자의 가명",
     },
     profile_picture: {
-      type: DataTypes.STRING(40),
+      type: DataTypes.UUID,
       comment: "연주자의 프로필 사진의 s3 key",
     },
     authorized: {
@@ -86,6 +94,8 @@ Player.init(
       type: DataTypes.DATEONLY,
       comment: "연주자가 회원탈퇴한 날짜",
     },
+    created_at: DataTypes.DATE,
+    updated_at: DataTypes.DATE,
   },
   {
     modelName: "player",

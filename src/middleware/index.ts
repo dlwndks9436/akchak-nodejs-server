@@ -13,6 +13,8 @@ import {
   practicelogUpdateInputValidator,
 } from "./practicelog";
 
+import { bookInputValidator } from "./book";
+
 export {
   checkDuplicatedEmail,
   checkDuplicatedUsername,
@@ -23,4 +25,5 @@ export {
   signupValidator,
   practicelogCreateInputValidator,
   practicelogUpdateInputValidator,
+  bookInputValidator,
 };

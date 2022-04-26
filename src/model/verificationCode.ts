@@ -1,18 +1,22 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Player from "./player";
 
-interface VerificationCodeCreationAttributes {
-  player_id: number;
-  code: string;
-}
-
 export default class VerificationCode extends Model<
-  VerificationCodeCreationAttributes,
-  VerificationCodeCreationAttributes
+  InferAttributes<VerificationCode>,
+  InferCreationAttributes<VerificationCode>
 > {
-  declare player_id: number;
+  declare player_id: ForeignKey<Player["id"]>;
   declare code: string;
+
+  declare player?: NonAttribute<Player>;
 }
 
 VerificationCode.init(

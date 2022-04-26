@@ -1,28 +1,32 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Book from "./book";
 import Goal from "./goal";
 
-interface PhraseModelAttributes extends PhraseCreationAttributes {
-  id: number;
-}
-
-interface PhraseCreationAttributes {
-  book_id: number;
-  title: string;
-  subheading: string;
-}
-
 export default class Phrase extends Model<
-  PhraseModelAttributes,
-  PhraseCreationAttributes
+  InferAttributes<Phrase>,
+  InferCreationAttributes<Phrase>
 > {
-  declare id: number;
-  declare book_id: number;
+  declare id: CreationOptional<number>;
+  declare book_id: ForeignKey<Book["id"]>;
   declare title: string;
   declare subheading: string;
-  declare created_at: Date;
-  declare updated_at: Date;
+
+  declare book?: NonAttribute<Book>;
+  declare goals?: NonAttribute<Goal[]>;
+
+  declare static associations: {
+    goals: Association<Phrase, Goal>;
+  };
 }
 
 Phrase.init(
@@ -34,15 +38,6 @@ Phrase.init(
       allowNull: false,
       unique: true,
       comment: "교본 안에 있는 프레이즈의 고유번호",
-    },
-    book_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      comment: "프레이즈가 속한 교본의 고유번호",
-      references: {
-        model: Book,
-        key: "id",
-      },
     },
     title: {
       type: DataTypes.STRING(20),

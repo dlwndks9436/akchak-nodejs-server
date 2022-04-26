@@ -1,37 +1,42 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Goal from "./goal";
 import Like from "./like";
 import Player from "./player";
 import Video from "./video";
 
-export interface PracticeLogModelAttributes
-  extends PracticeLogCreationAttributes {
-  id: number;
-  view: number;
-}
-
-interface PracticeLogCreationAttributes {
-  goal_id: number;
-  player_id: number;
-  memo: string;
-  time: number;
-  started_at: Date;
-}
-
 export default class PracticeLog extends Model<
-  PracticeLogModelAttributes,
-  PracticeLogCreationAttributes
+  InferAttributes<PracticeLog>,
+  InferCreationAttributes<PracticeLog>
 > {
-  declare id: number;
-  declare goal_id: number;
-  declare player_id: number;
-  declare memo: string;
+  declare id: CreationOptional<number>;
+  declare goal_id: ForeignKey<Goal["id"]>;
+  declare player_id: ForeignKey<Player["id"]>;
+  declare memo: CreationOptional<string>;
   declare time: number;
-  declare view: number;
+  declare view: CreationOptional<number>;
   declare started_at: Date;
-  declare created_at: Date;
-  declare updated_at: Date;
+  declare created_at: CreationOptional<Date>;
+  declare updated_at: CreationOptional<Date>;
+
+  declare likes?: NonAttribute<Like[]>;
+  declare video?: NonAttribute<Video>;
+  declare player?: NonAttribute<Player>;
+  declare goal?: NonAttribute<Goal>;
+
+  declare static associations: {
+    likes: Association<PracticeLog, Like>;
+    video: Association<PracticeLog, Video>;
+  };
 }
 
 PracticeLog.init(
@@ -44,27 +49,10 @@ PracticeLog.init(
       unique: true,
       comment: "연습 기록의 고유번호",
     },
-    goal_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      comment: "연습 기록에 설정된 목표의 고유번호",
-      references: {
-        model: Goal,
-        key: "id",
-      },
-    },
-    player_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      comment: "연습 기록을 만든 연주자의 고유번호",
-      references: {
-        model: Player,
-        key: "id",
-      },
-    },
     memo: {
       type: DataTypes.STRING(200),
       allowNull: false,
+      defaultValue: "",
       comment: "연주자가 연습한 후에 남긴 소감 내용",
     },
     time: {
@@ -83,6 +71,8 @@ PracticeLog.init(
       allowNull: false,
       comment: "연주자가 연습을 시작한 시간",
     },
+    created_at: DataTypes.DATE,
+    updated_at: DataTypes.DATE,
   },
   {
     modelName: "practice_log",

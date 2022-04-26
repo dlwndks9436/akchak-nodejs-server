@@ -1,29 +1,26 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import PracticeLog from "./practicelog";
 
-interface VideoModelAttributes extends VideoCreationAttributes {
-  id: number;
-}
-
-interface VideoCreationAttributes {
-  practice_log_id: number;
-  s3_key: string;
-  playback_time: number;
-  file_size: number;
-}
-
 export default class Video extends Model<
-  VideoModelAttributes,
-  VideoCreationAttributes
+  InferAttributes<Video>,
+  InferCreationAttributes<Video>
 > {
-  declare id: number;
-  declare practice_log_id: number;
+  declare id: CreationOptional<number>;
+  declare practice_log_id: ForeignKey<PracticeLog["id"]>;
   declare s3_key: string;
   declare playback_time: number;
   declare file_size: number;
-  declare created_at: Date;
-  declare updated_at: Date;
+
+  declare practice_log?: NonAttribute<PracticeLog>;
 }
 
 Video.init(
@@ -36,18 +33,8 @@ Video.init(
       unique: true,
       comment: "연주자가 녹화한 영상의 고유번호",
     },
-    practice_log_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      unique: true,
-      comment: "영상이 녹화된 연습 기록의 고유번호",
-      references: {
-        model: PracticeLog,
-        key: "id",
-      },
-    },
     s3_key: {
-      type: DataTypes.STRING(40),
+      type: DataTypes.UUID,
       allowNull: false,
       comment: "영상이 저장할 때 사용한 s3 key",
     },

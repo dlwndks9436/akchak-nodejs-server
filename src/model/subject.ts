@@ -1,21 +1,27 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Goal from "./goal";
 
-interface SubjectModelAttributes extends SubjectCreationAttributes {
-  id: number;
-}
-
-interface SubjectCreationAttributes {
-  name: string;
-}
-
 export default class Subject extends Model<
-  SubjectModelAttributes,
-  SubjectCreationAttributes
+  InferAttributes<Subject>,
+  InferCreationAttributes<Subject>
 > {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare name: string;
+
+  declare goals?: NonAttribute<Goal[]>;
+
+  declare static associations: {
+    goals: Association<Subject, Goal>;
+  };
 }
 
 Subject.init(

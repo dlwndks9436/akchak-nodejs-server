@@ -1,25 +1,49 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManySetAssociationsMixin,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Phrase from "./phrase";
 
-interface BookModelAttributes extends BookCreationAttributes {
-  id: number;
-}
-
-interface BookCreationAttributes {
-  title: string;
-  author: string;
-}
-
 export default class Book extends Model<
-  BookModelAttributes,
-  BookCreationAttributes
+  InferAttributes<Book>,
+  InferCreationAttributes<Book>
 > {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare title: string;
   declare author: string;
-  declare created_at: Date;
-  declare updated_at: Date;
+
+  declare getPhrases: HasManyGetAssociationsMixin<Phrase>;
+  declare addPhrase: HasManyAddAssociationMixin<Phrase, number>;
+  declare addPhrases: HasManyAddAssociationsMixin<Phrase, number>;
+  declare setPhrases: HasManySetAssociationsMixin<Phrase, number>;
+  declare removePhrase: HasManyRemoveAssociationMixin<Phrase, number>;
+  declare removePhrases: HasManyRemoveAssociationsMixin<Phrase, number>;
+  declare hasPhrase: HasManyHasAssociationMixin<Phrase, number>;
+  declare hasPhrases: HasManyHasAssociationsMixin<Phrase, number>;
+  declare countPhrases: HasManyCountAssociationsMixin;
+  declare createPhrase: HasManyCreateAssociationMixin<Phrase, "book_id">;
+
+  declare phrases?: NonAttribute<Phrase[]>;
+
+  declare static associations: {
+    phrases: Association<Book, Phrase>;
+  };
 }
 
 Book.init(

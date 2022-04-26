@@ -1,4 +1,11 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Player from "./player";
 
@@ -18,17 +25,14 @@ import Player from "./player";
  *          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ1NDI1NzgzLCJleHAiOjE2NDgwMTc3ODN9.SRxcjv0nWht25qDuzxPkn1OvnUQkJfG-v8VbOs5OpM4"
  */
 
-interface JWTTokenCreationAttributes {
-  player_id: number;
-  token: string;
-}
-
 export default class JWTToken extends Model<
-  JWTTokenCreationAttributes,
-  JWTTokenCreationAttributes
+  InferAttributes<JWTToken>,
+  InferCreationAttributes<JWTToken>
 > {
-  declare player_id: number;
+  declare player_id: ForeignKey<Player["id"]>;
   declare token: string;
+
+  declare player?: NonAttribute<Player>;
 }
 
 JWTToken.init(

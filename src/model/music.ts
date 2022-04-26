@@ -1,25 +1,28 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { sequelize } from ".";
 import Goal from "./goal";
 
-interface MusicModelAttributes extends MusicCreationAttributes {
-  id: number;
-}
-
-interface MusicCreationAttributes {
-  title: string;
-  artist: string;
-}
-
 export default class Music extends Model<
-  MusicModelAttributes,
-  MusicCreationAttributes
+  InferAttributes<Music>,
+  InferCreationAttributes<Music>
 > {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare title: string;
   declare artist: string;
-  declare created_at: Date;
-  declare updated_at: Date;
+
+  declare goals?: NonAttribute<Goal[]>;
+
+  declare static associations: {
+    goals: Association<Music, Goal>;
+  };
 }
 
 Music.init(
