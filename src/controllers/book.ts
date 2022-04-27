@@ -32,6 +32,7 @@ export const getBooks = async (req: Request, res: Response) => {
       const books = await Book.findAll({
         where: { title: { [Op.substring]: title as string } },
         limit: parseInt(limit as string),
+        order: ["title"],
       });
       res.status(StatusCodes.OK).send(books);
     }

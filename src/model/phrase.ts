@@ -20,6 +20,7 @@ export default class Phrase extends Model<
   declare book_id: ForeignKey<Book["id"]>;
   declare title: string;
   declare subheading: string;
+  declare page: number;
 
   declare book?: NonAttribute<Book>;
   declare goals?: NonAttribute<Goal[]>;
@@ -48,6 +49,11 @@ Phrase.init(
       type: DataTypes.STRING(20),
       allowNull: false,
       comment: "교본 안에 있는 프레이즈의 부제목",
+    },
+    page: {
+      type: DataTypes.SMALLINT.UNSIGNED,
+      allowNull: false,
+      comment: "교본 안에 있는 프레이즈가 위치한 페이지",
     },
   },
   {
