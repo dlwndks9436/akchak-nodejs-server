@@ -1,15 +1,16 @@
 import { Dialect, Sequelize } from "sequelize";
 import config from "../config/config";
 
-type env = "development" | "production";
+type Env = "development" | "production";
+const env = process.env.NODE_ENV || "development";
 
 export const sequelize = new Sequelize(
-  config[process.env.NODE_ENV as env].database as string,
-  config[process.env.NODE_ENV as env].username as string,
-  config[process.env.NODE_ENV as env].password,
+  config[env as Env].database as string,
+  config[env as Env].username as string,
+  config[env as Env].password || undefined,
   {
-    host: config[process.env.NODE_ENV as env].host,
-    dialect: config[process.env.NODE_ENV as env].dialect as Dialect,
+    host: config[env as Env].host,
+    dialect: config[env as Env].dialect as Dialect,
     pool: {
       max: 5,
       min: 0,
