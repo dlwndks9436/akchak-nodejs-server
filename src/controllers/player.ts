@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import Player from "../model/player";
+import Player from "../models/player";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import JWTToken from "../model/jwtToken";
+import JWTToken from "../models/jwtToken";
 import { StatusCodes } from "http-status-codes";
-import { sequelize } from "../model";
+import { sequelize } from "../models";
 import { verificationCodeToEmail } from "../lib/functions/verificationCodeToEmail";
-import VerificationCode from "../model/verificationCode";
+import VerificationCode from "../models/verificationCode";
 
 export const signup = async (req: Request, res: Response) => {
   try {

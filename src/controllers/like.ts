@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { sequelize } from "../model";
-import Like from "../model/like";
+import { sequelize } from "../models";
+import Like from "../models/like";
 
 export const getLike = async (req: Request, res: Response) => {
   try {

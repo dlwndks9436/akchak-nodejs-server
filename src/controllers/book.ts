@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { sequelize } from "../model";
+import { sequelize } from "../models";
 import { StatusCodes } from "http-status-codes";
-import Book from "../model/book";
+import Book from "../models/book";
 import { Op } from "sequelize";
 
 export const addBook = async (req: Request, res: Response) => {

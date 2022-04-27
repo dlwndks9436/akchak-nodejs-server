@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { getPagination } from "../lib/functions/getPagination";
 import { getPagingData } from "../lib/functions/getPagingData";
-import Practicelog from "../model/practicelog";
-import Player from "../model/player";
+import Practicelog from "../models/practicelog";
+import Player from "../models/player";
 import Sequelize from "sequelize";
 import getSignedS3URL from "../lib/functions/getSignedS3URL";
-import { sequelize } from "../model";
+import { sequelize } from "../models";
 import AWS from "aws-sdk";
 
 export const createPracticelog = async (req: Request, res: Response) => {

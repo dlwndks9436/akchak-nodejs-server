@@ -1,5 +1,5 @@
 import { sendMail } from "./sendMail";
-import VerificationCode from "../../model/verificationCode";
+import VerificationCode from "../../models/verificationCode";
 import generateVerificationCode from "./generateVerificationCode";
 
 export const verificationCodeToEmail = async (

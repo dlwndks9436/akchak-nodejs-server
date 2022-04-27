@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PlayerInterface } from "../interface/AuthRequest";
-import Player from "../model/player";
-import VerificationCode from "../model/verificationCode";
+import Player from "../models/player";
+import VerificationCode from "../models/verificationCode";
 import { StatusCodes } from "http-status-codes";
 import { body, validationResult } from "express-validator";
 
