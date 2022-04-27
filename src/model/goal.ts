@@ -49,8 +49,14 @@ Goal.init(
       unique: true,
       comment: "연습 목표의 고유번호",
     },
-    created_at: DataTypes.DATE,
-    updated_at: DataTypes.DATE,
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     modelName: "goal",

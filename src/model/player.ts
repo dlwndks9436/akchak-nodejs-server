@@ -94,8 +94,14 @@ Player.init(
       type: DataTypes.DATEONLY,
       comment: "연주자가 회원탈퇴한 날짜",
     },
-    created_at: DataTypes.DATE,
-    updated_at: DataTypes.DATE,
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     modelName: "player",
