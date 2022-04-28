@@ -13,6 +13,8 @@ import {
   practicelogUpdateInputValidator,
 } from "./practicelog";
 
+import { phraseAddInputValidator, phraseSearchInputValidator } from "./phrase";
+
 import { bookInputValidator } from "./book";
 
 export {
@@ -26,4 +28,6 @@ export {
   practicelogCreateInputValidator,
   practicelogUpdateInputValidator,
   bookInputValidator,
+  phraseAddInputValidator,
+  phraseSearchInputValidator,
 };
