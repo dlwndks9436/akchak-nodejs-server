@@ -8,7 +8,7 @@ export const getLike = async (req: Request, res: Response) => {
     await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
       const rating = await Like.findOrCreate({
-        where: { player_id: req.playerId, practice_log_id: practiceId },
+        where: { player_id: req.playerId, practicelog_id: practiceId },
         transaction: t,
       });
       if (!rating) {
@@ -30,7 +30,7 @@ export const changeLike = async (req: Request, res: Response) => {
       const rating = await Like.update(
         { is_like: isLike },
         {
-          where: { player_id: req.playerId, practice_log_id: practiceId },
+          where: { player_id: req.playerId, practicelog_id: practiceId },
           transaction: t,
         }
       );
@@ -54,7 +54,7 @@ export const countLikes = async (req: Request, res: Response) => {
       console.log("practice id string: ", practiceIdStr);
 
       const count = await Like.count({
-        where: { practice_log_id: practiceId, is_like: true },
+        where: { practicelog_id: practiceId, is_like: true },
         transaction: t,
       });
       console.log("count: ", count);

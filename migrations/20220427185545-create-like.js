@@ -17,7 +17,7 @@ module.exports = {
         allowNull: false,
         comment: "좋아요 여부",
       },
-      practice_log: {
+      practicelog_id: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
           model: {
@@ -28,7 +28,7 @@ module.exports = {
         allowNull: false,
         comment: "좋아요를 받은 연습기록",
       },
-      player: {
+      player_id: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
           model: {

@@ -17,7 +17,7 @@ export default class Like extends Model<
 > {
   declare id: CreationOptional<number>;
   declare player_id: ForeignKey<Player["id"]>;
-  declare practice_log_id: ForeignKey<PracticeLog["id"]>;
+  declare practicelog_id: ForeignKey<PracticeLog["id"]>;
   declare is_like: CreationOptional<boolean>;
 
   declare player?: NonAttribute<Player>;

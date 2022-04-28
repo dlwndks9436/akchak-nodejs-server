@@ -94,14 +94,8 @@ Player.init(
       type: DataTypes.DATEONLY,
       comment: "연주자가 회원탈퇴한 날짜",
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    created_at: DataTypes.DATE,
+    updated_at: DataTypes.DATE,
   },
   {
     modelName: "player",
@@ -199,7 +193,7 @@ JWTToken.belongsTo(Player, {
 Like.belongsTo(PracticeLog, {
   foreignKey: {
     allowNull: false,
-    name: "practice_log_id",
+    name: "practicelog_id",
   },
   constraints: true,
   onUpdate: "CASCADE",
@@ -317,7 +311,7 @@ PracticeLog.belongsTo(Player, {
 PracticeLog.hasOne(Video, {
   foreignKey: {
     allowNull: false,
-    name: "practice_log_id",
+    name: "practicelog_id",
   },
   constraints: true,
   onUpdate: "CASCADE",
@@ -327,7 +321,7 @@ PracticeLog.hasOne(Video, {
 PracticeLog.hasMany(Like, {
   foreignKey: {
     allowNull: false,
-    name: "practice_log_id",
+    name: "practicelog_id",
   },
   constraints: true,
   onUpdate: "CASCADE",
@@ -356,7 +350,7 @@ VerificationCode.belongsTo(Player, {
 Video.belongsTo(PracticeLog, {
   foreignKey: {
     allowNull: false,
-    name: "practice_log_id",
+    name: "practicelog_id",
   },
   constraints: true,
   onUpdate: "CASCADE",

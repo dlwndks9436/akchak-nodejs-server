@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
         comment: "교본 안에 있는 프레이즈의 부제목",
       },
-      book: {
+      book_id: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
           model: {
@@ -31,6 +31,11 @@ module.exports = {
         },
         allowNull: false,
         comment: "프레이즈가 속한 교본의 고유번호",
+      },
+      page: {
+        type: Sequelize.SMALLINT.UNSIGNED,
+        allowNull: false,
+        comment: "교본 안에 있는 프레이즈가 위치한 페이지",
       },
     });
   },

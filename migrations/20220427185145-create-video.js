@@ -26,7 +26,7 @@ module.exports = {
         allowNull: false,
         comment: "영상 파일의 용량 크기",
       },
-      practice_log: {
+      practicelog_id: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
           model: {

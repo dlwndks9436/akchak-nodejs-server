@@ -71,14 +71,8 @@ PracticeLog.init(
       allowNull: false,
       comment: "연주자가 연습을 시작한 시간",
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    created_at: DataTypes.DATE,
+    updated_at: DataTypes.DATE,
   },
   {
     modelName: "practice_log",

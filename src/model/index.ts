@@ -17,7 +17,6 @@ export const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000,
     },
-    timezone: "+09:00",
     define: {
       charset: "utf8mb4",
       collate: "utf8mb4_unicode_ci",

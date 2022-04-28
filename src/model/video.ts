@@ -15,7 +15,7 @@ export default class Video extends Model<
   InferCreationAttributes<Video>
 > {
   declare id: CreationOptional<number>;
-  declare practice_log_id: ForeignKey<PracticeLog["id"]>;
+  declare practicelog_id: ForeignKey<PracticeLog["id"]>;
   declare s3_key: string;
   declare playback_time: number;
   declare file_size: number;
