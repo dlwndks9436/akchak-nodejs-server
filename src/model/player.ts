@@ -15,7 +15,6 @@ import Like from "./like";
 import Music from "./music";
 import Phrase from "./phrase";
 import PracticeLog from "./practicelog";
-import Subject from "./subject";
 import VerificationCode from "./verificationCode";
 import Video from "./video";
 
@@ -127,15 +126,6 @@ Book.hasMany(Phrase, {
   foreignKey: {
     name: "book_id",
     allowNull: false,
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
-});
-
-Goal.belongsTo(Subject, {
-  foreignKey: {
-    name: "subject_id",
   },
   constraints: true,
   onUpdate: "CASCADE",
@@ -326,15 +316,6 @@ PracticeLog.hasMany(Like, {
   constraints: true,
   onUpdate: "CASCADE",
   onDelete: "CASCADE",
-});
-
-Subject.hasMany(Goal, {
-  foreignKey: {
-    name: "subject_id",
-  },
-  constraints: true,
-  onUpdate: "CASCADE",
-  onDelete: "RESTRICT",
 });
 
 VerificationCode.belongsTo(Player, {

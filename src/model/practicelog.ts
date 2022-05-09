@@ -24,7 +24,6 @@ export default class PracticeLog extends Model<
   declare memo: CreationOptional<string>;
   declare time: number;
   declare view: CreationOptional<number>;
-  declare started_at: Date;
   declare created_at: CreationOptional<Date>;
   declare updated_at: CreationOptional<Date>;
 
@@ -65,11 +64,6 @@ PracticeLog.init(
       allowNull: false,
       defaultValue: 0,
       comment: "연습 기록의 조회수",
-    },
-    started_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      comment: "연주자가 연습을 시작한 시간",
     },
     created_at: DataTypes.DATE,
     updated_at: DataTypes.DATE,

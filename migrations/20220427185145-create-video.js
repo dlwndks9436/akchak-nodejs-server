@@ -11,13 +11,18 @@ module.exports = {
         unique: true,
         comment: "연주자가 녹화한 영상의 고유번호",
       },
-      s3_key: {
-        type: Sequelize.UUID,
+      file_name: {
+        type: Sequelize.STRING(15),
         allowNull: false,
-        comment: "영상이 저장할 때 사용한 s3 key",
+        comment: "영상의 파일 이름",
+      },
+      file_name_ext: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        comment: "확장자를 포함한 영상의 파일 이름",
       },
       playback_time: {
-        type: Sequelize.SMALLINT.UNSIGNED,
+        type: Sequelize.FLOAT,
         allowNull: false,
         comment: "영상의 재생시간",
       },

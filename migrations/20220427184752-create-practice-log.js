@@ -30,11 +30,6 @@ module.exports = {
           defaultValue: 0,
           comment: "연습 기록의 조회수",
         },
-        started_at: {
-          type: Sequelize.DATE,
-          allowNull: false,
-          comment: "연주자가 연습을 시작한 시간",
-        },
         created_at: Sequelize.DATE,
         updated_at: Sequelize.DATE,
         goal_id: {
@@ -63,6 +58,8 @@ module.exports = {
       {
         timestamps: true,
         underscored: true,
+        createdAt: "created_at",
+        updatedAt: "updated_at",
       }
     );
   },

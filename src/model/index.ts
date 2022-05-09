@@ -21,6 +21,8 @@ export const sequelize = new Sequelize(
       charset: "utf8mb4",
       collate: "utf8mb4_unicode_ci",
       timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
       underscored: true,
       freezeTableName: true,
     },

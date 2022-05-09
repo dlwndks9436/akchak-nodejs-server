@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
-import Phrase from "../model/phrase";
+import { StatusCodes } from "http-status-codes";
+import Music from "../model/music";
 import { Op } from "sequelize";
 import { getPagination } from "../lib/functions/getPagination";
 
-export const addPhrase = async (req: Request, res: Response) => {
+export const addMusic = async (req: Request, res: Response) => {
   try {
-    const { title, subheading, page, bookId } = req.body;
+    const { title, artist } = req.body;
     await sequelize.transaction(async (t) => {
-      const [phrase, created] = await Phrase.findOrCreate({
-        where: { title, subheading, page, book_id: bookId },
+      const [music, created] = await Music.findOrCreate({
+        where: { title, artist },
       });
       if (!created) {
         res.status(StatusCodes.CONFLICT).end();
@@ -24,30 +24,26 @@ export const addPhrase = async (req: Request, res: Response) => {
   }
 };
 
-export const getPhrases = async (req: Request, res: Response) => {
+export const getMusics = async (req: Request, res: Response) => {
   try {
-    const { title, bookId, page, size } = req.query;
+    const { title, page, size } = req.query;
     const { limit, offset } = getPagination(page as string, size as string);
 
-    const totalPhrases = await Phrase.count({
+    const totalMusics = await Music.count({
       where: {
         title: { [Op.substring]: title as string },
-        book_id: parseInt(bookId as string),
       },
     });
 
-    const phrases = await Phrase.findAll({
-      where: {
-        title: { [Op.substring]: title as string },
-        book_id: parseInt(bookId as string),
-      },
+    const musics = await Music.findAll({
+      where: { title: { [Op.substring]: title as string } },
       limit,
       offset,
-      order: ["page", "title"],
+      order: ["title"],
     });
     res.status(StatusCodes.OK).json({
-      phrases,
-      total_pages: Math.ceil(totalPhrases / parseInt(size as string)),
+      musics,
+      total_pages: Math.ceil(totalMusics / parseInt(size as string)),
     });
   } catch (err) {
     console.log(err);

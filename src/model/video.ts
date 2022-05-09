@@ -16,7 +16,8 @@ export default class Video extends Model<
 > {
   declare id: CreationOptional<number>;
   declare practicelog_id: ForeignKey<PracticeLog["id"]>;
-  declare s3_key: string;
+  declare file_name: string;
+  declare file_name_ext: string;
   declare playback_time: number;
   declare file_size: number;
 
@@ -33,13 +34,18 @@ Video.init(
       unique: true,
       comment: "연주자가 녹화한 영상의 고유번호",
     },
-    s3_key: {
-      type: DataTypes.UUID,
+    file_name: {
+      type: DataTypes.STRING(15),
       allowNull: false,
-      comment: "영상이 저장할 때 사용한 s3 key",
+      comment: "영상의 파일 이름",
+    },
+    file_name_ext: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      comment: "확장자를 포함한 영상의 파일 이름",
     },
     playback_time: {
-      type: DataTypes.SMALLINT.UNSIGNED,
+      type: DataTypes.FLOAT,
       allowNull: false,
       comment: "영상의 재생시간",
     },

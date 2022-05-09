@@ -3,6 +3,6 @@ export const getPagination = (
   size: string | undefined
 ) => {
   const limit = size ? +parseInt(size, 10) : 10;
-  const offset = page ? parseInt(page, 10) * limit : 0;
+  const offset = page ? (parseInt(page, 10) - 1) * limit : 0;
   return { limit, offset };
 };

@@ -8,14 +8,13 @@ import {
   signupValidator,
 } from "./player";
 
-import {
-  practicelogCreateInputValidator,
-  practicelogUpdateInputValidator,
-} from "./practicelog";
+import { practicelogCreateInputValidator } from "./practicelog";
 
 import { phraseAddInputValidator, phraseSearchInputValidator } from "./phrase";
 
-import { bookInputValidator } from "./book";
+import { bookInputValidator, bookSearchInputValidator } from "./book";
+
+import { musicInputValidator, musicSearchInputValidator } from "./music";
 
 export {
   checkDuplicatedEmail,
@@ -26,8 +25,10 @@ export {
   loginValidator,
   signupValidator,
   practicelogCreateInputValidator,
-  practicelogUpdateInputValidator,
   bookInputValidator,
+  bookSearchInputValidator,
   phraseAddInputValidator,
   phraseSearchInputValidator,
+  musicInputValidator,
+  musicSearchInputValidator,
 };

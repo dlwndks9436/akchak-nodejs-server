@@ -3,6 +3,7 @@ import { sequelize } from "../model";
 import { StatusCodes } from "http-status-codes";
 import Book from "../model/book";
 import { Op } from "sequelize";
+import { getPagination } from "../lib/functions/getPagination";
 
 export const addBook = async (req: Request, res: Response) => {
   try {
@@ -25,17 +26,25 @@ export const addBook = async (req: Request, res: Response) => {
 
 export const getBooks = async (req: Request, res: Response) => {
   try {
-    const { limit, title } = req.query;
-    if (title?.length === 0) {
-      res.status(StatusCodes.BAD_REQUEST).end();
-    } else {
-      const books = await Book.findAll({
-        where: { title: { [Op.substring]: title as string } },
-        limit: parseInt(limit as string),
-        order: ["title"],
-      });
-      res.status(StatusCodes.OK).send(books);
-    }
+    const { title, page, size } = req.query;
+    const { limit, offset } = getPagination(page as string, size as string);
+
+    const totalBooks = await Book.count({
+      where: {
+        title: { [Op.substring]: title as string },
+      },
+    });
+
+    const books = await Book.findAll({
+      where: { title: { [Op.substring]: title as string } },
+      limit,
+      offset,
+      order: ["title"],
+    });
+    res.status(StatusCodes.OK).json({
+      books,
+      total_pages: Math.ceil(totalBooks / parseInt(size as string)),
+    });
   } catch (err) {
     console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).end(err);

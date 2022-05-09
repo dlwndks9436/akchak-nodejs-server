@@ -46,20 +46,12 @@ module.exports = {
           },
           comment: "연습 목표로 설정한 음악",
         },
-        subject_id: {
-          type: Sequelize.SMALLINT.UNSIGNED,
-          references: {
-            model: {
-              tableName: "subject",
-            },
-            key: "id",
-          },
-          comment: "연습 목표로 설정한 주제",
-        },
       },
       {
         timestamps: true,
         underscored: true,
+        createdAt: "created_at",
+        updatedAt: "updated_at",
       }
     );
   },

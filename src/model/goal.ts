@@ -13,7 +13,6 @@ import Music from "./music";
 import Phrase from "./phrase";
 import Player from "./player";
 import PracticeLog from "./practicelog";
-import Subject from "./subject";
 
 export default class Goal extends Model<
   InferAttributes<Goal>,
@@ -23,14 +22,12 @@ export default class Goal extends Model<
   declare player_id: ForeignKey<Player["id"]>;
   declare phrase_id: ForeignKey<Phrase["id"]>;
   declare music_id: ForeignKey<Music["id"]>;
-  declare subject_id: ForeignKey<Subject["id"]>;
   declare created_at: CreationOptional<Date>;
   declare updated_at: CreationOptional<Date>;
 
   declare player?: NonAttribute<Player>;
   declare phrase?: NonAttribute<Phrase>;
   declare music?: NonAttribute<Music>;
-  declare subject?: NonAttribute<Subject>;
 
   declare practice_logs?: NonAttribute<PracticeLog[]>;
 

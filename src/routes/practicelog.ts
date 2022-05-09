@@ -9,7 +9,6 @@ import {
 import {
   verifyAccessToken,
   practicelogCreateInputValidator,
-  practicelogUpdateInputValidator,
 } from "../middleware";
 
 export const practicelogRouter = Router();
@@ -247,39 +246,7 @@ practicelogRouter.get("/:practiceId", verifyAccessToken, getPracticelogById);
  *        description: Given access token is not valid
  */
 practicelogRouter.get("/", verifyAccessToken, getPracticelogs);
-/**
- * @swagger
- * /practice/{id}:
- *  patch:
- *    tags:
- *    - Practice
- *    summary: Update practice
- *    operationId: update practice
- *    parameters:
- *      - in : path
- *        name: id
- *        required: true
- *        schema:
- *          type: integer
- *        description: The numeric value of practice id
- *    security:
- *    - bearerAuth: []
- *    responses:
- *      200:
- *        description: Given access token is verified and input text is validated therefore update practice
- *      400:
- *        description: Input is not valid
- *      401:
- *        description: Given access token is not valid
- *      404:
- *        description: Practice not found
- */
-practicelogRouter.patch(
-  "/:practiceId",
-  verifyAccessToken,
-  practicelogUpdateInputValidator,
-  updatePracticelog
-);
+
 /**
  * @swagger
  * /practice/{id}:

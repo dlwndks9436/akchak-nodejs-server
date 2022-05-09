@@ -7,55 +7,42 @@ export const practicelogCreateInputValidator = async (
   res: Response,
   next: NextFunction
 ) => {
-  await body("title", "Invalid title")
-    .notEmpty()
-    .withMessage("email is empty")
-    .isLength({ min: 5 })
-    .withMessage("title must be longer than 5 characters")
-    .run(req);
-  await body("duration", "Invalid duration")
-    .notEmpty()
-    .withMessage("duration is empty")
-    .isNumeric()
-    .withMessage("duration is not a number")
-    .run(req);
-  await body("from", "Invalid directory name")
-    .notEmpty()
-    .withMessage("directory name is empty")
-    .run(req);
-  await body("s3Key", "Invalid key")
-    .notEmpty()
-    .withMessage("key name is empty")
-    .run(req);
-  await body("practiceTime", "Invalid practice time")
+  await body("time", "Invalid practice time")
     .notEmpty()
     .withMessage("practice time is empty")
     .isNumeric()
     .withMessage("practice time is not a number")
     .run(req);
-
-  const result = validationResult(req);
-  console.log("result: ", result);
-
-  if (!result.isEmpty()) {
-    return res.status(StatusCodes.BAD_REQUEST).json({ errors: result.array() });
-  }
-  next();
-};
-
-export const practicelogUpdateInputValidator = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  await body("title", "Invalid title")
+  await body("goalId", "Invalid goal id")
     .notEmpty()
-    .withMessage("email is empty")
-    .isLength({ min: 5 })
-    .withMessage("title must be longer than 5 characters")
+    .withMessage("goal id is empty")
+    .isNumeric()
+    .withMessage("goal id is not a number")
     .run(req);
+  await body("videoFileNameExt", "Invalid video file name with extension")
+    .notEmpty()
+    .withMessage("video file name with extension is empty")
+    .run(req);
+  await body("videoFileName", "Invalid video file name")
+    .notEmpty()
+    .withMessage("video file name is empty")
+    .run(req);
+  await body("videoPlaybackTime", "Invalid video playback time")
+    .notEmpty()
+    .withMessage("video playback time is empty")
+    .isNumeric()
+    .withMessage("video playback time is not a number")
+    .run(req);
+  await body("videoFileSize", "Invalid video file size")
+    .notEmpty()
+    .withMessage("video file size is empty")
+    .isNumeric()
+    .withMessage("video file size is not a number")
+    .run(req);
+
   const result = validationResult(req);
   console.log("result: ", result);
+
   if (!result.isEmpty()) {
     return res.status(StatusCodes.BAD_REQUEST).json({ errors: result.array() });
   }
