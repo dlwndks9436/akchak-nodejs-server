@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { getPagination } from "../lib/functions/getPagination";
-import { getPagingData } from "../lib/functions/getPagingData";
 import Practicelog from "../model/practicelog";
 import Player from "../model/player";
-import Sequelize from "sequelize";
+import { Op } from "sequelize";
 import getSignedS3URL from "../lib/functions/getSignedS3URL";
 import { sequelize } from "../model";
-import AWS from "aws-sdk";
 import Video from "../model/video";
 import PracticeLog from "../model/practicelog";
 import Goal from "../model/goal";
+import Phrase from "../model/phrase";
+import Book from "../model/book";
+import Music from "../model/music";
+import AWS from "aws-sdk";
 
 export const createPracticelog = async (req: Request, res: Response) => {
   try {
@@ -59,46 +61,101 @@ export const createPracticelog = async (req: Request, res: Response) => {
 
 export const getPracticelogs = async (req: Request, res: Response) => {
   try {
-    const { page, size, title, username } = req.query;
-    const condition: { title?: any; username?: any } | undefined =
-      title || username ? {} : undefined;
-    if (title) {
-      condition!.title = { [Sequelize.Op.like]: `%${title}%` };
-    }
-    if (username) {
-      condition!.username = { [Sequelize.Op.like]: `%${username}%` };
-    }
+    const { page, size, username } = req.query;
+    const title = req.query.title || "";
     const { limit, offset } = getPagination(page as string, size as string);
     const totalPracticelogs = await PracticeLog.count();
     const practiceLogs = await PracticeLog.findAll({
+      where: {
+        [Op.or]: [
+          { "$goal.phrase.title$": { [Op.substring]: title } },
+          { "$goal.phrase.book.title$": { [Op.substring]: title } },
+          { "$goal.music.title$": { [Op.substring]: title } },
+          { "$goal.music.artist$": { [Op.substring]: title } },
+        ],
+      },
       include: [
         {
           model: Video,
-          required: false,
+          required: true,
+          as: "video",
+        },
+        {
+          model: Player,
+          required: true,
+          as: "player",
         },
         {
           model: Goal,
           required: true,
+          as: "goal",
+          include: [
+            {
+              model: Phrase,
+              required: false,
+              as: "phrase",
+              include: [
+                {
+                  model: Book,
+                  required: true,
+                  as: "book",
+                },
+              ],
+            },
+            {
+              model: Music,
+              required: false,
+              as: "music",
+            },
+          ],
         },
       ],
       limit,
       offset,
+      order: [["created_at", "DESC"]],
     });
+    console.log(practiceLogs.length);
 
-    const thumbnailURLs = new Array<string>(practiceLogs.length);
+    const results = new Array(practiceLogs.length);
     practiceLogs.forEach((practice, index) => {
       const key = `thumbnail/${practice.player_id}/${practice.video?.file_name}.jpg`;
+      console.log(`thumbnail key: ${key}`);
+
       const signedUrl = getSignedS3URL({
         bucket: process.env.BUCKET!,
         key,
       });
-      thumbnailURLs[index] = signedUrl;
+      let item;
+      if (practice.goal?.phrase) {
+        item = {
+          id: practice.id,
+          playerName: practice.player?.username,
+          phraseTitle: practice.goal?.phrase?.title,
+          phraseSubheading: practice.goal?.phrase?.subheading,
+          bookTitle: practice.goal?.phrase?.book?.title,
+          view: practice.view,
+          playbackTime: practice.video?.playback_time,
+          thumbnailUrl: signedUrl,
+          createdAt: practice.created_at,
+        };
+      } else {
+        item = {
+          id: practice.id,
+          playerName: practice.player?.username,
+          musicTitle: practice.goal?.music?.title,
+          musicArtist: practice.goal?.music?.artist,
+          view: practice.view,
+          playbackTime: practice.video?.playback_time,
+          thumbnailUrl: signedUrl,
+          createdAt: practice.created_at,
+        };
+      }
+      results[index] = item;
     });
 
     res.status(StatusCodes.OK).json({
-      practiceLogs,
+      results,
       totalPages: Math.ceil(totalPracticelogs / parseInt(size as string)),
-      thumbnailURLs,
     });
   } catch (err) {
     console.log(err);
@@ -111,24 +168,85 @@ export const getPracticelogById = async (req: Request, res: Response) => {
     const practicelogId = req.params.practiceId;
     const playerId = req.playerId;
     const result = await sequelize.transaction(async (t) => {
-      const practicelog = await Practicelog.findOne({
+      const practiceLog = await Practicelog.findOne({
         where: { id: practicelogId },
-        include: [{ model: Player, required: true }],
+        include: [
+          {
+            model: Video,
+            required: true,
+          },
+          {
+            model: Player,
+            required: true,
+          },
+          {
+            model: Goal,
+            required: true,
+            include: [
+              {
+                model: Phrase,
+                required: false,
+                include: [
+                  {
+                    model: Book,
+                    required: true,
+                  },
+                ],
+              },
+              {
+                model: Music,
+                required: false,
+              },
+            ],
+          },
+        ],
         transaction: t,
       });
-      if (!practicelog) {
+      if (!practiceLog) {
         return null;
       }
-      const isOwner = playerId === practicelog.player_id;
-      await practicelog.update(
-        { view: practicelog.view + 1 },
-        { transaction: t }
-      );
-      // const signedUrl = getSignedS3URL({
-      //   bucket: process.env.BUCKET!,
-      //   key: practicelog.s3_key,
-      // });
-      // return { practicelog, signedUrl, isOwner };
+      const isOwner = playerId === practiceLog.player_id;
+      if (!isOwner) {
+        await practiceLog.update(
+          { view: practiceLog.view + 1 },
+          { transaction: t }
+        );
+      }
+      const key = `video/${practiceLog.player_id}/${practiceLog.video?.file_name_ext}`;
+      const videoUrl = getSignedS3URL({
+        bucket: process.env.BUCKET!,
+        key,
+      });
+      let item;
+      if (practiceLog.goal?.phrase) {
+        item = {
+          id: practiceLog.id,
+          playerName: practiceLog.player?.username,
+          phraseTitle: practiceLog.goal?.phrase?.title,
+          phraseSubheading: practiceLog.goal?.phrase?.subheading,
+          bookTitle: practiceLog.goal?.phrase?.book?.title,
+          view: practiceLog.view,
+          playbackTime: practiceLog.video?.playback_time,
+          createdAt: practiceLog.created_at,
+          memo: practiceLog.memo,
+          videoUrl,
+          isOwner,
+        };
+      } else {
+        item = {
+          id: practiceLog.id,
+          playerName: practiceLog.player?.username,
+          musicTitle: practiceLog.goal?.music?.title,
+          musicArtist: practiceLog.goal?.music?.artist,
+          view: practiceLog.view,
+          playbackTime: practiceLog.video?.playback_time,
+          createdAt: practiceLog.created_at,
+          memo: practiceLog.memo,
+          videoUrl,
+          isOwner,
+        };
+      }
+      return item;
     });
     if (result) {
       res.status(StatusCodes.OK).send(result);
@@ -178,31 +296,37 @@ export const deletePracticelog = async (req: Request, res: Response) => {
     const result = await sequelize.transaction(async (t) => {
       const practicelog = await Practicelog.findOne({
         where: { id: practiceId, player_id: playerId },
+        include: [{ model: Video, required: true }],
         transaction: t,
       });
-      // const s3 = new AWS.S3();
-      // const bucketParams1 = {
-      //   Bucket: process.env.BUCKET!,
-      //   Key: practicelog?.s3_key.split(".")[0] + ".jpg",
-      // };
-      // const bucketParams2 = {
-      //   Bucket: process.env.BUCKET!,
-      //   Key: practice?.s3_key!,
-      // };
-      // s3.deleteObject(bucketParams1, (err, data) => {
-      //   if (err) {
-      //     throw err;
-      //   }
-      //   console.log("s3 delete thumbnail ", data);
-      // });
-      // s3.deleteObject(bucketParams2, (err, data) => {
-      //   if (err) {
-      //     throw err;
-      //   }
-      //   console.log("s3 delete video ", data);
-      // });
-      await practicelog?.destroy({ transaction: t });
-      return true;
+      if (practicelog) {
+        const mediaName = practicelog?.video?.file_name;
+        const s3 = new AWS.S3();
+        const bucketParams1 = {
+          Bucket: process.env.BUCKET!,
+          Key: `thumbnail/${practiceId}/${mediaName}.jpg`,
+        };
+        const bucketParams2 = {
+          Bucket: process.env.BUCKET!,
+          Key: `video/${practiceId}/${mediaName}.mp4`,
+        };
+        s3.deleteObject(bucketParams1, (err, data) => {
+          if (err) {
+            throw err;
+          }
+          console.log("s3 delete thumbnail ", data);
+        });
+        s3.deleteObject(bucketParams2, (err, data) => {
+          if (err) {
+            throw err;
+          }
+          console.log("s3 delete video ", data);
+        });
+        await practicelog?.destroy({ transaction: t });
+        return true;
+      } else {
+        return false;
+      }
     });
     if (result) {
       res.status(StatusCodes.OK).end();

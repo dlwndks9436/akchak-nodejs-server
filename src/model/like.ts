@@ -36,7 +36,7 @@ Like.init(
     },
     is_like: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
       allowNull: false,
       comment: "좋아요 여부",
     },

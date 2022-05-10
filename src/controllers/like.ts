@@ -48,7 +48,7 @@ export const changeLike = async (req: Request, res: Response) => {
 export const countLikes = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
-      const practiceIdStr = req.query.practiceId as string;
+      const practiceIdStr = req.query.practiceLogId as string;
       const practiceId = parseInt(practiceIdStr, 10);
       console.log("practice id: ", practiceId);
       console.log("practice id string: ", practiceIdStr);

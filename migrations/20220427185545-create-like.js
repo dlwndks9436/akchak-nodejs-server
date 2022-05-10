@@ -13,7 +13,7 @@ module.exports = {
       },
       is_like: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
         allowNull: false,
         comment: "좋아요 여부",
       },
