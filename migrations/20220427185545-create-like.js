@@ -26,6 +26,8 @@ module.exports = {
           key: "id",
         },
         allowNull: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
         comment: "좋아요를 받은 연습기록",
       },
       player_id: {
@@ -36,6 +38,8 @@ module.exports = {
           },
           key: "id",
         },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
         allowNull: false,
         comment: "좋아요를 한 연주자",
       },

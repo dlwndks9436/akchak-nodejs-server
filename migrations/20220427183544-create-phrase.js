@@ -30,6 +30,8 @@ module.exports = {
           key: "id",
         },
         allowNull: false,
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
         comment: "프레이즈가 속한 교본의 고유번호",
       },
       page: {

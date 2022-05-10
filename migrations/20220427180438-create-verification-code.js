@@ -14,6 +14,8 @@ module.exports = {
           },
           key: "id",
         },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
         comment: "인증 코드를 발급 받는 연주자",
       },
       code: {

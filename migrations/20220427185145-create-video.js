@@ -39,6 +39,8 @@ module.exports = {
           },
           key: "id",
         },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
         allowNull: false,
         comment: "연주 영상이 속한 연습 기록",
       },

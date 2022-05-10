@@ -24,6 +24,8 @@ module.exports = {
             key: "id",
           },
           allowNull: false,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
           comment: "연습 목표를 설정한 연주자",
         },
         phrase_id: {
@@ -34,6 +36,8 @@ module.exports = {
             },
             key: "id",
           },
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE'
           comment: "연습 목표로 설정한 프레이즈",
         },
         music_id: {
@@ -44,6 +48,8 @@ module.exports = {
             },
             key: "id",
           },
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE'
           comment: "연습 목표로 설정한 음악",
         },
       },

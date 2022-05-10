@@ -14,6 +14,8 @@ module.exports = {
           key: "id",
         },
         allowNull: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
         comment: "JWT 토큰을 발급 받은 연주자",
       },
       token: {

@@ -40,6 +40,8 @@ module.exports = {
             },
             key: "id",
           },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
           allowNull: false,
           comment: "연습 기록에 설정된 목표의 고유번호",
         },
@@ -51,6 +53,8 @@ module.exports = {
             },
             key: "id",
           },
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
           allowNull: false,
           comment: "연습 기록을 만든 연주자의 고유번호",
         },
