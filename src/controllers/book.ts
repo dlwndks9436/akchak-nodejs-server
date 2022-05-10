@@ -26,7 +26,8 @@ export const addBook = async (req: Request, res: Response) => {
 
 export const getBooks = async (req: Request, res: Response) => {
   try {
-    const { title, page, size } = req.query;
+    const { page, size } = req.query;
+    const title = req.query.title || "";
     const { limit, offset } = getPagination(page as string, size as string);
 
     const totalBooks = await Book.count({

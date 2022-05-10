@@ -4,7 +4,6 @@ import {
   deletePracticelog,
   getPracticelogById,
   getPracticelogs,
-  updatePracticelog,
 } from "../controllers/practicelog";
 import {
   verifyAccessToken,

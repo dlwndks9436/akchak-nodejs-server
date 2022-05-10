@@ -34,8 +34,9 @@ export const addGoal = async (req: Request, res: Response) => {
 
 export const getGoals = async (req: Request, res: Response) => {
   try {
-    const { page, size, title, type } = req.query;
+    const { page, size, type } = req.query;
     const { limit, offset } = getPagination(page as string, size as string);
+    const title = req.query.title || "";
     let totalGoals = 0;
     let goals;
     if (type === "음악") {

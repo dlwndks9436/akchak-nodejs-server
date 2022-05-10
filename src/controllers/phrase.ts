@@ -26,7 +26,8 @@ export const addPhrase = async (req: Request, res: Response) => {
 
 export const getPhrases = async (req: Request, res: Response) => {
   try {
-    const { title, bookId, page, size } = req.query;
+    const { bookId, page, size } = req.query;
+    const title = req.query.title || "";
     const { limit, offset } = getPagination(page as string, size as string);
 
     const totalPhrases = await Phrase.count({

@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import { getPagination } from "../lib/functions/getPagination";
 import Practicelog from "../model/practicelog";
 import Player from "../model/player";
-import { Op } from "sequelize";
 import getSignedS3URL from "../lib/functions/getSignedS3URL";
 import { sequelize } from "../model";
 import Video from "../model/video";
@@ -13,6 +12,7 @@ import Phrase from "../model/phrase";
 import Book from "../model/book";
 import Music from "../model/music";
 import AWS from "aws-sdk";
+import { getPracticeLogsByType } from "../lib/functions/getPracticeLogsByType";
 
 export const createPracticelog = async (req: Request, res: Response) => {
   try {
@@ -61,59 +61,16 @@ export const createPracticelog = async (req: Request, res: Response) => {
 
 export const getPracticelogs = async (req: Request, res: Response) => {
   try {
-    const { page, size, username } = req.query;
-    const title = req.query.title || "";
+    const { page, size, type } = req.query;
+    const query = req.query.query || "";
     const { limit, offset } = getPagination(page as string, size as string);
     const totalPracticelogs = await PracticeLog.count();
-    const practiceLogs = await PracticeLog.findAll({
-      where: {
-        [Op.or]: [
-          { "$goal.phrase.title$": { [Op.substring]: title } },
-          { "$goal.phrase.book.title$": { [Op.substring]: title } },
-          { "$goal.music.title$": { [Op.substring]: title } },
-          { "$goal.music.artist$": { [Op.substring]: title } },
-        ],
-      },
-      include: [
-        {
-          model: Video,
-          required: true,
-          as: "video",
-        },
-        {
-          model: Player,
-          required: true,
-          as: "player",
-        },
-        {
-          model: Goal,
-          required: true,
-          as: "goal",
-          include: [
-            {
-              model: Phrase,
-              required: false,
-              as: "phrase",
-              include: [
-                {
-                  model: Book,
-                  required: true,
-                  as: "book",
-                },
-              ],
-            },
-            {
-              model: Music,
-              required: false,
-              as: "music",
-            },
-          ],
-        },
-      ],
+    const practiceLogs = await getPracticeLogsByType(
+      type as string,
+      query as string,
       limit,
-      offset,
-      order: [["created_at", "DESC"]],
-    });
+      offset
+    );
     console.log(practiceLogs.length);
 
     const results = new Array(practiceLogs.length);
@@ -261,34 +218,6 @@ export const getPracticelogById = async (req: Request, res: Response) => {
   }
 };
 
-export const updatePracticelog = async (req: Request, res: Response) => {
-  try {
-    const practicelogId = req.params.practiceId;
-    const playerId = req.playerId;
-    const { memo } = req.body;
-    const result = await sequelize.transaction(async (t) => {
-      const practice = await Practicelog.update(
-        { memo },
-        {
-          where: { id: practicelogId, player_id: playerId },
-          transaction: t,
-        }
-      );
-      return practice[0] > 0;
-    });
-    if (result) {
-      res.status(StatusCodes.OK).end();
-    } else {
-      res
-        .status(StatusCodes.NOT_FOUND)
-        .send({ message: "Practice log not found" });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
-  }
-};
-
 export const deletePracticelog = async (req: Request, res: Response) => {
   try {
     const practiceId = req.params.practiceId;
@@ -304,11 +233,11 @@ export const deletePracticelog = async (req: Request, res: Response) => {
         const s3 = new AWS.S3();
         const bucketParams1 = {
           Bucket: process.env.BUCKET!,
-          Key: `thumbnail/${practiceId}/${mediaName}.jpg`,
+          Key: `thumbnail/${playerId}/${mediaName}.jpg`,
         };
         const bucketParams2 = {
           Bucket: process.env.BUCKET!,
-          Key: `video/${practiceId}/${mediaName}.mp4`,
+          Key: `video/${playerId}/${mediaName}.mp4`,
         };
         s3.deleteObject(bucketParams1, (err, data) => {
           if (err) {
