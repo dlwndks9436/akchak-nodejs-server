@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
 import { verificationCodeToEmail } from "../lib/functions/verificationCodeToEmail";
 import VerificationCode from "../model/verificationCode";
+import { Op } from "sequelize";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -38,6 +39,9 @@ export const login = async (req: Request, res: Response) => {
       const player = await Player.findOne({
         where: {
           email,
+          unregistered_at: {
+            [Op.is]: null,
+          },
         },
         transaction: t,
       });
@@ -114,18 +118,21 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
-      await JWTToken.destroy({
+      const deletedRecord = await JWTToken.destroy({
         where: { player_id: req.playerId, token: req.token },
         individualHooks: true,
         hooks: true,
         transaction: t,
-      }).then((deletedRecord) => {
-        if (deletedRecord) {
-          res.status(StatusCodes.OK).end();
-        } else {
-          res.status(StatusCodes.NOT_FOUND).end();
-        }
       });
+      if (deletedRecord) {
+        await sequelize.query(
+          `DROP EVENT IF EXISTS destroy_jwt_token${req.playerId}`,
+          { transaction: t }
+        );
+        res.status(StatusCodes.OK).end();
+      } else {
+        res.status(StatusCodes.NOT_FOUND).end();
+      }
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
@@ -136,7 +143,12 @@ export const issueVerificationCode = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const player = await Player.findOne({
-        where: { email: req.body.email },
+        where: {
+          email: req.body.email,
+          unregistered_at: {
+            [Op.is]: null,
+          },
+        },
         transaction: t,
       });
       if (player) {
@@ -163,7 +175,12 @@ export const issueVerificationCode = async (req: Request, res: Response) => {
 export const checkVerificationCode = async (req: Request, res: Response) => {
   try {
     const player = await Player.findOne({
-      where: { email: req.query.email as string },
+      where: {
+        email: req.query.email as string,
+        unregistered_at: {
+          [Op.is]: null,
+        },
+      },
       raw: true,
     });
     if (player) {
@@ -204,7 +221,15 @@ export const authorizeUser = async (req: Request, res: Response) => {
         .then(async () => {
           const player = await Player.update(
             { authorized: true },
-            { where: { id: req.playerId }, transaction: t }
+            {
+              where: {
+                id: req.playerId,
+                unregistered_at: {
+                  [Op.is]: null,
+                },
+              },
+              transaction: t,
+            }
           );
           if (player) {
             res.status(StatusCodes.OK).send({ message: "이메일 인증 성공" });
@@ -260,7 +285,14 @@ export const reissueAccessToken = async (req: Request, res: Response) => {
 };
 
 export const getPlayerInfo = async (req: Request, res: Response) => {
-  const player = await Player.findOne({ where: { id: req.playerId } });
+  const player = await Player.findOne({
+    where: {
+      id: req.playerId,
+      unregistered_at: {
+        [Op.is]: null,
+      },
+    },
+  });
   if (player) {
     res.status(StatusCodes.OK).send({
       id: req.playerId,
@@ -278,7 +310,14 @@ export const changePassword = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const { email, code, password } = req.body;
-      const player = await Player.findOne({ where: { email } });
+      const player = await Player.findOne({
+        where: {
+          email,
+          unregistered_at: {
+            [Op.is]: null,
+          },
+        },
+      });
       if (!player) {
         res.status(StatusCodes.UNAUTHORIZED).end();
       } else {
@@ -314,7 +353,14 @@ export const changePasswordById = async (req: Request, res: Response) => {
       }
       const { password, previousPassword } = req.body;
 
-      const player = await Player.findOne({ where: { id: req.playerId } });
+      const player = await Player.findOne({
+        where: {
+          id: req.playerId,
+          unregistered_at: {
+            [Op.is]: null,
+          },
+        },
+      });
       if (!player) {
         res.status(StatusCodes.UNAUTHORIZED).end();
         console.log("해당 유저가 존재하지 않습니다");
@@ -335,6 +381,44 @@ export const changePasswordById = async (req: Request, res: Response) => {
       }
     });
   } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
+  }
+};
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  try {
+    await sequelize.transaction(async (t) => {
+      const player = await Player.findOne({
+        where: {
+          id: req.playerId,
+          unregistered_at: {
+            [Op.is]: null,
+          },
+        },
+        transaction: t,
+      });
+      if (player) {
+        await sequelize.query(
+          `CREATE EVENT destroy_player${player.id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 30 DAY DO DELETE FROM player WHERE id = ${player.id}`,
+          {
+            transaction: t,
+          }
+        );
+        await sequelize.query(
+          `DROP EVENT IF EXISTS destroy_jwt_token${req.playerId}`,
+          { transaction: t }
+        );
+        await player.update(
+          { unregistered_at: new Date() },
+          { transaction: t }
+        );
+        res.status(StatusCodes.OK).end();
+      } else {
+        res.status(StatusCodes.UNAUTHORIZED).end();
+      }
+    });
+  } catch (err) {
+    console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
   }
 };

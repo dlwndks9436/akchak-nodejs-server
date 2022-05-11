@@ -19,6 +19,7 @@ import {
   authorizeUser,
   getPlayerInfo,
   changePasswordById,
+  deleteAccount,
 } from "../controllers/player";
 import { passwordValidator } from "../middleware/player";
 
@@ -387,3 +388,5 @@ playerRouter.patch(
 );
 
 playerRouter.patch("/password", passwordValidator, changePassword);
+
+playerRouter.delete("/account", verifyAccessToken, deleteAccount);

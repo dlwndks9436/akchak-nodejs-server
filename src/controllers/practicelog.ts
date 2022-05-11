@@ -74,7 +74,7 @@ export const getPracticelogs = async (req: Request, res: Response) => {
       limit,
       offset
     );
-    console.log(practiceLogs.length);
+    console.log(practiceLogs);
 
     const results = new Array(practiceLogs.length);
     practiceLogs.forEach((practice, index) => {
@@ -129,33 +129,46 @@ export const getPracticelogById = async (req: Request, res: Response) => {
     const playerId = req.playerId;
     const result = await sequelize.transaction(async (t) => {
       const practiceLog = await Practicelog.findOne({
-        where: { id: practicelogId },
+        attributes: ["id", "view", "created_at", "player_id", "memo"],
+        where: {
+          id: practicelogId,
+          "$player.unregistered_at$": {
+            [Op.is]: null,
+          },
+        },
         include: [
           {
             model: Video,
             required: true,
+            attributes: ["playback_time", "file_name_ext"],
           },
           {
             model: Player,
             required: true,
+            as: "player",
+            attributes: ["username"],
           },
           {
             model: Goal,
             required: true,
+            attributes: ["phrase_id", "music_id"],
             include: [
               {
                 model: Phrase,
                 required: false,
+                attributes: ["title", "subheading"],
                 include: [
                   {
                     model: Book,
                     required: true,
+                    attributes: ["title"],
                   },
                 ],
               },
               {
                 model: Music,
                 required: false,
+                attributes: ["title", "artist"],
               },
             ],
           },

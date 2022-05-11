@@ -105,7 +105,7 @@ export const checkDuplicatedUsername = (
     .then((user) => {
       if (user) {
         res.status(StatusCodes.CONFLICT).send({
-          msg: "Provided username is already occupied.",
+          msg: "이미 사용 중인 닉네임입니다",
           param: "username",
           value: req.body.username,
         });
@@ -133,7 +133,7 @@ export const checkDuplicatedEmail = (
     .then((user) => {
       if (user) {
         res.status(StatusCodes.CONFLICT).send({
-          msg: "Provided email is already occupied.",
+          msg: "이미 사용 중인 이메일입니다",
           param: "email",
           value: req.body.email,
         });
