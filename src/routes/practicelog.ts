@@ -4,6 +4,7 @@ import {
   deletePracticelog,
   getPracticelogById,
   getPracticelogs,
+  getRecentPracticeTime,
 } from "../controllers/practicelog";
 import {
   verifyAccessToken,
@@ -93,6 +94,8 @@ practicelogRouter.post(
   practicelogCreateInputValidator,
   createPracticelog
 );
+
+practicelogRouter.get("/time", verifyAccessToken, getRecentPracticeTime);
 /**
  * @swagger
  * /practice/{id}:

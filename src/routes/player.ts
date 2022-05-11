@@ -18,6 +18,7 @@ import {
   changePassword,
   authorizeUser,
   getPlayerInfo,
+  changePasswordById,
 } from "../controllers/player";
 import { passwordValidator } from "../middleware/player";
 
@@ -377,5 +378,12 @@ playerRouter.delete("/token", verifyRefreshToken, logout);
  *       description: Given access token is not valid
  */
 playerRouter.get("/info", verifyAccessToken, getPlayerInfo);
+
+playerRouter.patch(
+  "/password/:playerId",
+  verifyAccessToken,
+  passwordValidator,
+  changePasswordById
+);
 
 playerRouter.patch("/password", passwordValidator, changePassword);

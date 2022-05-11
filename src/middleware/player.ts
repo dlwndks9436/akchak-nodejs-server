@@ -11,7 +11,8 @@ export const verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  // const token = req.headers["x-access-token"] as string | undefined;
+  console.log("access token 검증 시작");
+
   const bearerHeader = req.headers["authorization"];
   if (!bearerHeader) {
     return res

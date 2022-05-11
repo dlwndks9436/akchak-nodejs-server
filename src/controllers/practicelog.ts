@@ -13,6 +13,9 @@ import Book from "../model/book";
 import Music from "../model/music";
 import AWS from "aws-sdk";
 import { getPracticeLogsByType } from "../lib/functions/getPracticeLogsByType";
+import { Op } from "sequelize";
+import { sub, differenceInDays } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
 
 export const createPracticelog = async (req: Request, res: Response) => {
   try {
@@ -267,5 +270,39 @@ export const deletePracticelog = async (req: Request, res: Response) => {
   } catch (err) {
     console.log(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
+  }
+};
+
+export const getRecentPracticeTime = async (req: Request, res: Response) => {
+  try {
+    const playerId = req.playerId;
+    const timezone = req.query.timezone;
+    const now = utcToZonedTime(new Date(), timezone as string);
+    const result = new Array<number>(7).fill(0);
+    const practicelogs = await PracticeLog.findAll({
+      where: {
+        created_at: {
+          [Op.gte]: sub(new Date(), { days: 7 }),
+        },
+        player_id: playerId,
+      },
+      raw: true,
+      attributes: ["created_at", "time"],
+    });
+    console.log(practicelogs);
+
+    practicelogs.forEach((practicelog) => {
+      const localDate = utcToZonedTime(
+        practicelog.created_at,
+        timezone as string
+      );
+      const difference = differenceInDays(now, localDate);
+      result[result.length - 1 - difference] += practicelog.time;
+    });
+    console.log(result);
+
+    res.status(StatusCodes.OK).send(result);
+  } catch (err) {
+    console.log(err);
   }
 };

@@ -305,3 +305,36 @@ export const changePassword = async (req: Request, res: Response) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
   }
 };
+
+export const changePasswordById = async (req: Request, res: Response) => {
+  try {
+    await sequelize.transaction(async (t) => {
+      if (req.playerId !== parseInt(req.params.playerId)) {
+        res.status(StatusCodes.NOT_ACCEPTABLE).end();
+      }
+      const { password, previousPassword } = req.body;
+
+      const player = await Player.findOne({ where: { id: req.playerId } });
+      if (!player) {
+        res.status(StatusCodes.UNAUTHORIZED).end();
+        console.log("해당 유저가 존재하지 않습니다");
+      } else {
+        if (!bcrypt.compareSync(previousPassword, player?.password as string)) {
+          console.log("비밀번호가 옳지 않습니다");
+
+          res.status(StatusCodes.UNAUTHORIZED).end();
+        } else if (bcrypt.compareSync(password, player?.password as string)) {
+          res.status(StatusCodes.CONFLICT).end();
+        } else {
+          await player.update(
+            { password: bcrypt.hashSync(password) },
+            { transaction: t }
+          );
+          res.status(StatusCodes.OK).end();
+        }
+      }
+    });
+  } catch (err) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
+  }
+};
