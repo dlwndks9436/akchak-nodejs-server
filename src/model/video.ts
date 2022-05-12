@@ -45,7 +45,7 @@ Video.init(
       comment: "확장자를 포함한 영상의 파일 이름",
     },
     playback_time: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.FLOAT().UNSIGNED,
       allowNull: false,
       comment: "영상의 재생시간",
     },

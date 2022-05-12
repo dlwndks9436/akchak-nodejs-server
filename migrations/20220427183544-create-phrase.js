@@ -23,15 +23,7 @@ module.exports = {
       },
       book_id: {
         type: Sequelize.INTEGER.UNSIGNED,
-        references: {
-          model: {
-            tableName: "book",
-          },
-          key: "id",
-        },
         allowNull: false,
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
         comment: "프레이즈가 속한 교본의 고유번호",
       },
       page: {
@@ -40,9 +32,21 @@ module.exports = {
         comment: "교본 안에 있는 프레이즈가 위치한 페이지",
       },
     });
+    await queryInterface.addConstraint("phrase", {
+      fields: ["book_id"],
+      type: "foreign key",
+      name: "fk_phrase_book",
+      references: {
+        table: "book",
+        field: "id",
+      },
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeConstraint("phrase", "fk_phrase_book");
     await queryInterface.dropTable("phrase");
   },
 };

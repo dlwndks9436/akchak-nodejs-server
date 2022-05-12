@@ -8,14 +8,6 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         unique: true,
-        references: {
-          model: {
-            tableName: "player",
-          },
-          key: "id",
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
         comment: "인증 코드를 발급 받는 연주자",
       },
       code: {
@@ -24,9 +16,24 @@ module.exports = {
         comment: "인증 코드",
       },
     });
+    await queryInterface.addConstraint("verification_code", {
+      fields: ["player_id"],
+      type: "foreign key",
+      name: "fk_verificationcode_player",
+      references: {
+        table: "player",
+        field: "id",
+      },
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    });
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeConstraint(
+      "verification_code",
+      "fk_verificationcode_player"
+    );
     await queryInterface.dropTable("verification_code");
   },
 };
