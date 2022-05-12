@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PlayerInterface } from "../interface/AuthRequest";
 import Player from "../model/player";
 import VerificationCode from "../model/verificationCode";
 import { StatusCodes } from "http-status-codes";
 import { body, validationResult } from "express-validator";
+
+interface PlayerInterface {
+  id: number;
+}
 
 export const verifyAccessToken = (
   req: Request,
