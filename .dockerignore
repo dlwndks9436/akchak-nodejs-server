@@ -1,0 +1,32 @@
+node_modules
+Dockerfile
+.dockerignore
+.git
+.gitignore
+src
+docker-compose*
+yarn-error.log# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+.git
+
+.gitignore# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+.git
+
+.gitignore# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+.git
+
+.gitignore# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+.git
+
+.gitignore
