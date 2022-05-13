@@ -1,10 +1,15 @@
 version: "3.8"
 services:
   node-app:
-    build: .
+    build:
+      context: .
+      args:
+        - NODE_ENV=production
     ports:
       - "30000:30000"
     env_file:
       - ./.env
     environment:
       - PORT=30000
+      - NODE_ENV=production
+    command: node dist/index.js
