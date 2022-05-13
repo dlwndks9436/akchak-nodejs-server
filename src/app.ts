@@ -6,6 +6,7 @@ import { sequelize } from "./model";
 import indexRouter from "./routes";
 import swaggerDocs from "./utils/swagger";
 import helmet from "helmet";
+import { StatusCodes } from "http-status-codes";
 
 export const app = express();
 
@@ -18,7 +19,7 @@ app.use(indexRouter);
 // Logic goes here
 
 app.get("/", (req, res) => {
-  res.send("악착 api에 오신 것을 환영합니다!");
+  res.status(StatusCodes.OK).send("악착 api에 오신 것을 환영합니다!");
 });
 
 (async () => {
