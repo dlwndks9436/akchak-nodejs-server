@@ -56,6 +56,7 @@ export const getGoals = async (req: Request, res: Response) => {
         },
         limit,
         offset,
+        raw: true,
       });
     } else if (type === "교본") {
       totalGoals = await Goal.count({
@@ -74,8 +75,11 @@ export const getGoals = async (req: Request, res: Response) => {
         },
         limit,
         offset,
+        raw: true,
       });
     }
+    console.log(goals);
+
     res.status(StatusCodes.OK).json({
       goals,
       total_pages: Math.ceil(totalGoals / parseInt(size as string)),

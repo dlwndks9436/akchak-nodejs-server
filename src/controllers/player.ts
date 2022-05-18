@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import JWTToken from "../model/jwtToken";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../model";
-import { verificationCodeToEmail } from "../lib/functions/verificationCodeToEmail";
 import VerificationCode from "../model/verificationCode";
 import { Op } from "sequelize";
 
@@ -22,9 +21,7 @@ export const signup = async (req: Request, res: Response) => {
         { transaction: t }
       );
       if (player) {
-        res
-          .status(StatusCodes.CREATED)
-          .send({ message: "Player registration complete." });
+        res.status(StatusCodes.CREATED).end();
       }
     });
   } catch (err) {
@@ -48,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
       if (!player) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .send({ message: "The given email does not belong to any player" });
+          .send({ message: "존재하지 않는 계정입니다" });
       }
       const passwordIsValid = bcrypt.compareSync(
         req.body.password,
@@ -56,7 +53,7 @@ export const login = async (req: Request, res: Response) => {
       );
       if (!passwordIsValid) {
         return res.status(StatusCodes.UNAUTHORIZED).send({
-          message: "The given password does not match",
+          message: "비밀번호가 옳지 않습니다",
         });
       }
       const accessToken = jwt.sign(
@@ -115,102 +112,6 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
-  try {
-    await sequelize.transaction(async (t) => {
-      const deletedRecord = await JWTToken.destroy({
-        where: { player_id: req.playerId, token: req.token },
-        individualHooks: true,
-        hooks: true,
-        transaction: t,
-      });
-      if (deletedRecord) {
-        await sequelize.query(
-          `DROP EVENT IF EXISTS destroy_jwt_token${req.playerId}`,
-          { transaction: t }
-        );
-        res.status(StatusCodes.OK).end();
-      } else {
-        res.status(StatusCodes.NOT_FOUND).end();
-      }
-    });
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
-  }
-};
-
-export const issueVerificationCode = async (req: Request, res: Response) => {
-  try {
-    await sequelize.transaction(async (t) => {
-      const player = await Player.findOne({
-        where: {
-          email: req.body.email,
-          unregistered_at: {
-            [Op.is]: null,
-          },
-        },
-        transaction: t,
-      });
-      if (player) {
-        const result = await verificationCodeToEmail(player.id, player.email);
-        if (result) {
-          res
-            .status(StatusCodes.OK)
-            .send({ message: "사용자 이메일로 인증코드 전송됨" });
-        } else {
-          throw new Error("인증 코드 전송 과정 중에 에러 발생함");
-        }
-      } else {
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .send({ message: "권한이 없습니다" });
-      }
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: err });
-  }
-};
-
-export const checkVerificationCode = async (req: Request, res: Response) => {
-  try {
-    const player = await Player.findOne({
-      where: {
-        email: req.query.email as string,
-        unregistered_at: {
-          [Op.is]: null,
-        },
-      },
-      raw: true,
-    });
-    if (player) {
-      const code = await VerificationCode.findOne({
-        where: { player_id: player.id },
-      });
-      if (code) {
-        if (code.code === req.query.code) {
-          await sequelize.query(
-            "ALTER EVENT destroy_verification_code" +
-              code.player_id +
-              " ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 HOUR DO DELETE FROM verification_code WHERE player_id = " +
-              code.player_id
-          );
-          res.status(StatusCodes.OK).end();
-        } else {
-          res.status(StatusCodes.CONFLICT).end();
-        }
-      } else {
-        res.status(StatusCodes.NOT_FOUND).end();
-      }
-    } else {
-      res.status(StatusCodes.UNAUTHORIZED).end();
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: err });
-  }
-};
-
 export const authorizeUser = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
@@ -237,47 +138,6 @@ export const authorizeUser = async (req: Request, res: Response) => {
             throw new Error("유효하지 않는 접근입니다");
           }
         });
-    });
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
-  }
-};
-
-export const reissueAccessToken = async (req: Request, res: Response) => {
-  try {
-    await sequelize.transaction(async (t) => {
-      const token = await JWTToken.findOne({
-        where: { token: req.token, player_id: req.playerId },
-        transaction: t,
-      });
-      if (!token) {
-        res.status(StatusCodes.BAD_REQUEST).send("Invalid access.");
-      } else {
-        const accessToken = jwt.sign(
-          { id: req.playerId },
-          process.env.JWT_SECRET_KEY!,
-          {
-            expiresIn: process.env.EXPIRATION_OF_ACCESS_TOKEN,
-          }
-        );
-        const refreshToken = jwt.sign(
-          { id: req.playerId },
-          process.env.JWT_SECRET_KEY!,
-          {
-            expiresIn: process.env.EXPIRATION_OF_REFRESH_TOKEN,
-          }
-        );
-        token.token = refreshToken;
-        const updatedToken = await token.save({ transaction: t });
-        if (!updatedToken) {
-          throw new Error("Issue occured while updating token");
-        } else {
-          res.status(StatusCodes.OK).send({
-            accessToken,
-            refreshToken,
-          });
-        }
-      }
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);

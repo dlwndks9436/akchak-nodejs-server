@@ -9,22 +9,6 @@ import {
 import { sequelize } from ".";
 import Player from "./player";
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    tokens:
- *      description: "Schema for access token and refresh token"
- *      type: object
- *      properties:
- *        accessToken:
- *          type: string
- *          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ1MTk2MDYzLCJleHAiOjE2NDUxOTYxODN9.mXVh6rh-k54fB_KiD-4n-7vpzALWLAgB3d91CqwjBtk"
- *        refresToken:
- *          type: string
- *          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ1NDI1NzgzLCJleHAiOjE2NDgwMTc3ODN9.SRxcjv0nWht25qDuzxPkn1OvnUQkJfG-v8VbOs5OpM4"
- */
-
 export default class JWTToken extends Model<
   InferAttributes<JWTToken>,
   InferCreationAttributes<JWTToken>

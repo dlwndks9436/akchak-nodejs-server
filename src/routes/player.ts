@@ -6,15 +6,10 @@ import {
   signupValidator,
   verifyVerificationCode,
   verifyAccessToken,
-  verifyRefreshToken,
 } from "../middleware";
 import {
   login,
-  reissueAccessToken,
-  issueVerificationCode,
   signup,
-  logout,
-  checkVerificationCode,
   changePassword,
   authorizeUser,
   getPlayerInfo,
@@ -26,12 +21,12 @@ import { passwordValidator } from "../middleware/player";
 export const playerRouter = Router();
 /**
  * @swagger
- * /auth/signup:
+ * /api/player:
  *  post:
  *    tags:
- *    - Auth
- *    summary: Signup
- *    description: Validate user input and create user
+ *    - Player
+ *    summary: 사용자 회원가입
+ *    description: 사용자가 입력한 username, email, password이 유효성 검사를 통과하면 회원가입이 완료됩니다.
  *    requestBody:
  *      required: true
  *      content:
@@ -41,33 +36,36 @@ export const playerRouter = Router();
  *            properties:
  *              username:
  *                type: string
- *                example: "username123"
+ *                example: "김아무개123"
  *              email:
  *                type: string
  *                example: "username@email-domain.com"
  *              password:
  *                type: string
- *                example: "yourComplexPassword1452"
+ *                example: "mypassword1452!"
  *    operationId: signup
  *    responses:
  *      201:
- *        description: User's input meets criterea therefore create user
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "User registration complete."
+ *        description: 사용자가 입력한 username, email, password가 모든 기준을 통과하여 회원가입이 완료되었습니다.
  *      400:
- *        description: User input did not pass validation
+ *        description: 사용자가 입력한 username, email, password 중 하나라도 기준을 통과되지 못하면 실패한 원인을 응답으로 받습니다.
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/validation-error'
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  value:
+ *                    type: string
+ *                  msg:
+ *                    type: string
+ *                  param:
+ *                    type: string
+ *                  location:
+ *                    type: string
  *      409:
- *        description: User already exists using given inputs
+ *        description: 사용자가 입력한 email이나 username이 이미 다른 사용자가 이용 중이면 중복된 항목 관련된 정보를 응답으로 받습니다.
  *        content:
  *          application/json:
  *            schema:
@@ -81,12 +79,12 @@ export const playerRouter = Router();
  *                value:
  *                  type: string
  *              example:
- *                msg: "Provided username is already occupied."
- *                param: "username"
- *                value: "username123"
+ *                msg: "이미 사용 중인 이메일입니다"
+ *                param: "email"
+ *                value: "username@email-domain.com"
  */
 playerRouter.post(
-  "/signup",
+  "/",
   signupValidator,
   checkDuplicatedEmail,
   checkDuplicatedUsername,
@@ -94,12 +92,12 @@ playerRouter.post(
 );
 /**
  * @swagger
- * /auth/login:
+ * /api/player/login:
  *  post:
  *    tags:
- *    - Auth
- *    summary: Login
- *    description: Verifies a user and return tokens
+ *    - Player
+ *    summary: 사용자 로그인
+ *    description: 사용자가 입력한 email과 password이 유효하면 사용자 정보와 토큰을 발급 받습니다.
  *    operationId: login
  *    requestBody:
  *      required: true
@@ -113,10 +111,10 @@ playerRouter.post(
  *                example: "username@email-domain.com"
  *              password:
  *                type: string
- *                example: "yourComplexPassword1452"
+ *                example: "myPassword1452!"
  *    responses:
  *      200:
- *        description: User is recognized and token is sent
+ *        description: 사용자가 입력한 email과 password가 유효하므로, 해당되는 사용자 정보와 토큰을 발급 받습니다.
  *        content:
  *          application/json:
  *            schema:
@@ -132,7 +130,7 @@ playerRouter.post(
  *                  type: string
  *                email:
  *                  type: string
- *                active:
+ *                authorized:
  *                  type: boolean
  *                banned_until:
  *                  type: object
@@ -142,16 +140,27 @@ playerRouter.post(
  *                id: 3
  *                username: 'username123'
  *                email: "username@email-domain.com"
- *                active: true
+ *                authorized: true
  *                banned_until: null
  *      400:
- *        description: User input did not pass validation
+ *        description: 사용자가 입력한 email, password 중 하나라도 기준을 통과하지 못하면 실패한 원인을 응답으로 받습니다.
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/validation-error'
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  value:
+ *                    type: string
+ *                  msg:
+ *                    type: string
+ *                  param:
+ *                    type: string
+ *                  location:
+ *                    type: string
  *      401:
- *        description: The given password does not match
+ *        description: 입력한 이메일이 유효하지만 비밀번호가 옳지 않을 경우 응답받습니다.
  *        content:
  *          application/json:
  *            schema:
@@ -159,9 +168,9 @@ playerRouter.post(
  *              properties:
  *                message:
  *                  type: string
- *                  example: "The given password does not match"
+ *                  example: "비밀번호가 옳지 않습니다"
  *      404:
- *        description: The given email does not belong to any user
+ *        description: 입력한 이메일을 사용하는 계정이 존재하지 않을 때 응답받습니다.
  *        content:
  *          application/json:
  *            schema:
@@ -169,67 +178,19 @@ playerRouter.post(
  *              properties:
  *                message:
  *                  type: string
- *                  example: "The given email does not belong to any user"
+ *                  example: "존재하지 않는 계정입니다"
  */
 playerRouter.post("/login", loginValidator, login);
-/**
- * @swagger
- * /auth/code:
- *  get:
- *    tags:
- *    - Auth
- *    summary: Issue auth code
- *    description: Verifies access token and issue auth code
- *    operationId: issue auth code
- *    security:
- *      - bearerAuth: []
- *    responses:
- *      200:
- *        description: Access token is verified and auth code is sent to user's email
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Auth code sent to user's email."
- *      400:
- *        description: Given access token belongs to non existing user
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Invalid access."
- *      401:
- *        description: Given access token is not valid
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Given access token is not valid"
- *                expired:
- *                  type: boolean
- *                  example: false
- */
-playerRouter.post("/verification-code", issueVerificationCode);
 
-playerRouter.get("/verification-code", checkVerificationCode);
 /**
  * @swagger
- * /auth/activate-user:
- *  post:
+ * /api/player/authorized:
+ *  patch:
  *    tags:
- *    - Auth
- *    summary: Activate user's account
- *    description: Check auth code to determine authenticated user and activate account
- *    operationId: activate user
+ *    - Player
+ *    summary: 사용자 앱 사용 권한 부여
+ *    description: 입력한 인증코드가 계정에 저장된 인증코드와 일치하면 해당 계정이 앱 사용할 수 있도록 하고, 12시간 뒤에 계정이 자동소멸되는 것을 방지합니다.
+ *    operationId: authorize user
  *    security:
  *    - bearerAuth: []
  *    requestBody:
@@ -239,12 +200,12 @@ playerRouter.get("/verification-code", checkVerificationCode);
  *          schema:
  *            type: object
  *            properties:
- *              authCode:
+ *              code:
  *                type: string
  *                example: "XSrWTV"
  *    responses:
  *      200:
- *        description: Given access token and auth code is verified therefore activated user's account
+ *        description: 제공한 토큰에 해당되는 계정의 인증 코드와 입력한 인증 코드가 일치할 때 응답합니다. 계정을 자동으로 삭제하는 event를 삭제하고 계정의 authorized를 true로 설정하여 앱을 사용할 수 있도록 합니다.
  *        content:
  *          application/json:
  *            schema:
@@ -252,9 +213,9 @@ playerRouter.get("/verification-code", checkVerificationCode);
  *              properties:
  *                message:
  *                  type: string
- *                  example: "User email is successfully authenticated"
+ *                  example: "이메일 인증 성공"
  *      401:
- *        description: Given access token is not valid
+ *        description: 제공한 토큰이 유효하지 않을 때 응답합니다.
  *        content:
  *          application/json:
  *            schema:
@@ -262,9 +223,9 @@ playerRouter.get("/verification-code", checkVerificationCode);
  *              properties:
  *                message:
  *                  type: string
- *                  example: "Given access token is not valid"
+ *                  example: "유효한 토큰이 아닙니다"
  *      403:
- *        description: Given auth code is not valid
+ *        description: 제공한 인증 코드가 유효하지 않을 때 응답합니다.
  *        content:
  *          application/json:
  *            schema:
@@ -272,7 +233,7 @@ playerRouter.get("/verification-code", checkVerificationCode);
  *              properties:
  *                message:
  *                  type: string
- *                  example: "Given auth code is not valid"
+ *                  example: "유효한 인증코드가 아닙니다"
  */
 playerRouter.patch(
   "/authorized",
@@ -280,80 +241,21 @@ playerRouter.patch(
   verifyVerificationCode,
   authorizeUser
 );
-/**
- * @swagger
- * /auth/token:
- *  patch:
- *    tags:
- *    - Auth
- *    summary: Reissue access token
- *    description: Reissue user's access token
- *    operationId: reissue access token
- *    security:
- *    - bearerAuth: []
- *    responses:
- *      200:
- *        description: Given refresh token is verified therefore reissue access token
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/tokens'
- *      400:
- *        description: Given refresh token belongs to non existing user
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Invalid access."
- *      401:
- *        description: Given refresh token is not valid
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: "Given access token is not valid"
- */
-playerRouter.patch("/token", verifyRefreshToken, reissueAccessToken);
-/**
- * @swagger
- * /auth/token:
- *  delete:
- *    tags:
- *    - Auth
- *    summary: Delete access token
- *    description: Delete token in database
- *    operationId: delete token
- *    security:
- *    - bearerAuth: []
- *    responses:
- *      200:
- *        description: Given refresh token is verified therefore delete corresponding token in database
- *      401:
- *        description: Given refresh token is not valid
- *      404:
- *        description: Given refresh token is verified but corresponding token does not exit in database
- */
-playerRouter.delete("/token", verifyRefreshToken, logout);
 
 /**
  * @swagger
- * /user/info:
+ * /api/player/info:
  *  get:
  *    tags:
- *    - User
- *    summary: Get user's info
+ *    - Player
+ *    summary: 사용자 정보 제공
+ *    description: 제공한 access token이 유효하면 사용자 정보를 제공합니다.
  *    operationId: get user's info
  *    security:
  *    - bearerAuth: []
  *    responses:
  *      200:
- *        description: Given access token is verified therefore provide user info
+ *        description: 제공한 access token이 유효하면 사용자 정보를 제공합니다.
  *        content:
  *          application/json:
  *            schema:
@@ -365,7 +267,7 @@ playerRouter.delete("/token", verifyRefreshToken, logout);
  *                  type: string
  *                email:
  *                  type: string
- *                active:
+ *                authorized:
  *                  type: boolean
  *                banned_until:
  *                  type: object
@@ -373,20 +275,145 @@ playerRouter.delete("/token", verifyRefreshToken, logout);
  *                id: 3
  *                username: 'username123'
  *                email: "username@email-domain.com"
- *                active: true
+ *                authorized: true
  *                banned_until: null
  *      401:
- *       description: Given access token is not valid
+ *       description: 제공한 access token이 유효하지 않을 때 응답합니다.
  */
 playerRouter.get("/info", verifyAccessToken, getPlayerInfo);
-
+/**
+ * @swagger
+ * /api/player/password/{playerId}:
+ *  patch:
+ *    tags:
+ *    - Player
+ *    summary: 기존 비밀번호를 이용한 비밀번호 변경
+ *    desciprtion: 기존 비밀번호를 이용해서 사용자 인증을 한 후에 통과하면 제공한 새 비밀번호로 교체합니다.
+ *    operationId: change user's password
+ *    security:
+ *    - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: playerId
+ *        required: true
+ *        schema:
+ *          type: integer
+ *          minimum: 1
+ *        description: 사용자의 고유 번호
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              previousPassword:
+ *                type: string
+ *                example: "mypassword1452!"
+ *              password:
+ *                type: string
+ *                example: "mynewpassword1452!"
+ *    responses:
+ *      200:
+ *        description: 제공한 access token이 유효하고 새 비밀번호의 형식이 올바르면 응답합니다. 데이터베이스 비밀번호를 새 비밀번호로 바꿉니다.
+ *      400:
+ *       description: 제공한 새 비밀번호의 형식이 올바르지 않으면 응답합니다.
+ *       content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  value:
+ *                    type: string
+ *                  msg:
+ *                    type: string
+ *                  param:
+ *                    type: string
+ *                  location:
+ *                    type: string
+ *      401:
+ *        description: 찾는 사용자가 데이터베이스에 존재하지 않거나 기존 비밀번호가 옳지 않으면 응답합니다.
+ *      406:
+ *        description: 제공한 access token에 있는 사용자 정보와 path parameter로 제공한 사용자 정보가 일치하지 않을 때 응답합니다.
+ *      409:
+ *        description: 새 비밀번호가 기존 비밀번호와 일치할 때 응답합니다.
+ */
 playerRouter.patch(
   "/password/:playerId",
   verifyAccessToken,
   passwordValidator,
   changePasswordById
 );
-
+/**
+ * @swagger
+ * /api/player/password:
+ *  patch:
+ *    tags:
+ *    - Player
+ *    summary: 인증 코드를 이용한 비밀번호 변경
+ *    description: 제공한 인증코드와 이메일이 유효하고 새 비밀번호의 형식이 올바르면 데이터베이스에 저장된 비밀번호를 제공한 것으로 변경합니다.
+ *    operationId: change user's password with verification code
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                example: "username@email-domain.com"
+ *              code:
+ *                type: string
+ *                example: "XSrWTV"
+ *              password:
+ *                type: string
+ *                example: "mynewpassword1452!"
+ *    responses:
+ *      200:
+ *        description: 제공한 인증코드와 이메일이 유효하고 새 비밀번호의 형식이 올바를 때 응답합니다. 데이터베이스에 저장된 비밀번호를 새 비밀번호로 변경합니다.
+ *      400:
+ *       description: 제공한 새 비밀번호의 형식이 올바르지 않으면 응답합니다.
+ *       content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  value:
+ *                    type: string
+ *                  msg:
+ *                    type: string
+ *                  param:
+ *                    type: string
+ *                  location:
+ *                    type: string
+ *      401:
+ *        description: 제공한 이메일이나 인증코드가 유효하지 않을 때 응답합니다.
+ *      404:
+ *        description: 이메일로 사용자를 식별할 수 있었지만 코드가 데이터베이스에 존재하지 않을 때 응답합니다.
+ *      409:
+ *        description: 새 비밀번호가 기존 비밀번호와 일치할 때 응답합니다.
+ */
 playerRouter.patch("/password", passwordValidator, changePassword);
-
+/**
+ * @swagger
+ * /api/player/account:
+ *  delete:
+ *    tags:
+ *    - Player
+ *    summary: 사용자 계정 삭제
+ *    description: 제공한 access token이 유효하면 사용자 계정을 30일 후에 자동으로 삭제하는 event를 생성합니다.
+ *    operationId: delete user's account
+ *    security:
+ *    - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: 제공한 access token이 유효하면 응답합니다. 사용자가 앱 사용하지 못하도록하고, 30일 후에 계정이 삭제되는 event를 생성합니다.
+ *      401:
+ *        description: 제공한 access token이 유효하지 않을 때 응답합니다.
+ */
 playerRouter.delete("/account", verifyAccessToken, deleteAccount);

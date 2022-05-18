@@ -1,99 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 import Player from "../model/player";
 import VerificationCode from "../model/verificationCode";
 import { StatusCodes } from "http-status-codes";
 import { body, validationResult } from "express-validator";
-
-interface PlayerInterface {
-  id: number;
-}
-
-export const verifyAccessToken = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.log("access token 검증 시작");
-
-  const bearerHeader = req.headers["authorization"];
-  if (!bearerHeader) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .send({ message: "Access token is not provided", expired: false });
-  }
-  const bearer = bearerHeader.split(" ");
-  const bearerToken = bearer[1];
-
-  jwt.verify(bearerToken, process.env.JWT_SECRET_KEY!, (err, decoded) => {
-    if (err) {
-      if (err.name === "TokenExpiredError") {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .send({ message: "Given access token is not valid", expired: true });
-      } else {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .send({ message: "Given access token is not valid", expired: false });
-      }
-    }
-    req.playerId = (decoded as PlayerInterface).id;
-    next();
-  });
-};
-
-export const verifyRefreshToken = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const bearerHeader = req.headers["authorization"];
-  if (!bearerHeader) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .send({ message: "No token provided." });
-  }
-  const bearer = bearerHeader.split(" ");
-  const bearerToken = bearer[1];
-  jwt.verify(bearerToken, process.env.JWT_SECRET_KEY!, (err, decoded) => {
-    if (err) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .send({ message: "Invalid token provided" });
-    }
-    req.playerId = (decoded as PlayerInterface).id;
-    req.token = bearerToken;
-    next();
-  });
-};
-
-export const verifyVerificationCode = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const verificationCode = req.body.code;
-  if (!verificationCode)
-    return res
-      .status(StatusCodes.FORBIDDEN)
-      .send({ message: "인증코드가 확인되지 않았습니다" });
-  await VerificationCode.findOne({ where: { player_id: req.playerId } })
-    .then(async (code) => {
-      if (code?.code === verificationCode) {
-        await code!.destroy({ hooks: true });
-        next();
-      } else {
-        return res
-          .status(StatusCodes.FORBIDDEN)
-          .send({ message: "Given verification code is not valid" });
-      }
-    })
-    .catch((err: Error) => {
-      return res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
-    });
-};
 
 export const checkDuplicatedUsername = (
   req: Request,
@@ -158,22 +67,28 @@ export const signupValidator = async (
 ) => {
   await body("email", "Invalid email")
     .notEmpty()
-    .withMessage("email is empty")
+    .withMessage("이메일을 입력해주세요")
     .isEmail()
-    .withMessage("invalid email form")
+    .withMessage("올바른 이메일 형식으로 입력해주세요")
     .normalizeEmail()
     .run(req);
   await body("username", "Invalid username")
     .notEmpty()
-    .withMessage("username is empty")
-    .matches(/^(?=.*[a-z])[a-zA-Z0-9]{8,20}$/i)
-    .withMessage("username does not meet criteria")
+    .withMessage("닉네임을 입력해주세요")
+    .if((_: any, { req }: any) => {
+      return req.body.username.length >= 3 && req.body.username.length <= 15;
+    })
+    .withMessage("닉네임을 3~15자 이내로 입력해주세요")
+    .matches(/^[가-힣|a-z|A-Z|0-9|]+$/)
+    .withMessage("닉네임을 한글, 영어, 숫자로 만들어주세요")
     .run(req);
   await body("password", "Invalid password")
     .notEmpty()
-    .withMessage("password is empty")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
-    .withMessage("password does not meet criteria")
+    .withMessage("비밀번호를 입력해주세요")
+    .matches(/^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W)).{8,16}$/)
+    .withMessage(
+      "비밀번호를 8자 이상 16자 이하, 영어, 숫자, 특수문자로 만들어주세요"
+    )
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);
@@ -191,16 +106,16 @@ export const loginValidator = async (
 ) => {
   await body("email", "Invalid email")
     .notEmpty()
-    .withMessage("email is empty")
+    .withMessage("이메일을 입력해주세요")
     .isEmail()
-    .withMessage("invalid email form")
+    .withMessage("이메일을 올바른 형식으로 입력해주세요")
     .normalizeEmail()
     .run(req);
   await body("password", "Invalid password")
     .notEmpty()
-    .withMessage("password is empty")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
-    .withMessage("password does not meet requirements")
+    .withMessage("비밀번호를 입력해주세요")
+    .matches(/^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W)).{8,16}$/)
+    .withMessage("비밀번호를 올바른 형식으로 입력해주세요")
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);
@@ -218,9 +133,11 @@ export const passwordValidator = async (
 ) => {
   await body("password", "Invalid password")
     .notEmpty()
-    .withMessage("password is empty")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
-    .withMessage("password does not meet requirements")
+    .withMessage("비밀번호를 입력해주세요")
+    .matches(/^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W)).{8,16}$/)
+    .withMessage(
+      "비밀번호를 8자 이상 16자 이하, 영어, 숫자, 특수문자로 만들어주세요"
+    )
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);

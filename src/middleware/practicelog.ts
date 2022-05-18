@@ -9,35 +9,35 @@ export const practicelogCreateInputValidator = async (
 ) => {
   await body("time", "Invalid practice time")
     .notEmpty()
-    .withMessage("practice time is empty")
+    .withMessage("연습 시간을 입력해주세요")
     .isNumeric()
-    .withMessage("practice time is not a number")
+    .withMessage("연습 시간을 숫자로만 입력해주세요")
     .run(req);
   await body("goalId", "Invalid goal id")
     .notEmpty()
-    .withMessage("goal id is empty")
+    .withMessage("goal id를 입력해주세요")
     .isNumeric()
-    .withMessage("goal id is not a number")
+    .withMessage("goal id를 숫자로만 입력해주세요")
     .run(req);
   await body("videoFileNameExt", "Invalid video file name with extension")
     .notEmpty()
-    .withMessage("video file name with extension is empty")
+    .withMessage("videoFileNameExt을 입력해주세요")
     .run(req);
   await body("videoFileName", "Invalid video file name")
     .notEmpty()
-    .withMessage("video file name is empty")
+    .withMessage("videoFileName을 입력해주세요")
     .run(req);
   await body("videoPlaybackTime", "Invalid video playback time")
     .notEmpty()
-    .withMessage("video playback time is empty")
+    .withMessage("videoPlaybackTime을 입력해주세요")
     .isNumeric()
-    .withMessage("video playback time is not a number")
+    .withMessage("videoPlaybackTime을 숫자로만 입력해주세요")
     .run(req);
   await body("videoFileSize", "Invalid video file size")
     .notEmpty()
-    .withMessage("video file size is empty")
+    .withMessage("videoFileSize을 입력해주세요")
     .isNumeric()
-    .withMessage("video file size is not a number")
+    .withMessage("videoFileSize을 숫자로만 입력해주세요")
     .run(req);
 
   const result = validationResult(req);

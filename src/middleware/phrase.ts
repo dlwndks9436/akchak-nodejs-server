@@ -9,19 +9,19 @@ export const phraseAddInputValidator = async (
 ) => {
   await body("title", "Invalid title")
     .notEmpty()
-    .withMessage("title is empty")
+    .withMessage("제목을 입력해주세요")
     .run(req);
   await body("page", "Invalid page")
     .notEmpty()
-    .withMessage("page is empty")
+    .withMessage("page를 입력해주세요")
     .isNumeric()
-    .withMessage("page is not a number")
+    .withMessage("page를 숫자로만 입력해주세요")
     .run(req);
   await body("bookId", "Invalid book ID")
     .notEmpty()
-    .withMessage("book ID is empty")
+    .withMessage("bookId를 입력해주세요")
     .isNumeric()
-    .withMessage("book ID is not a number")
+    .withMessage("bookId를 숫자로만 입력해주세요")
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);
@@ -38,21 +38,21 @@ export const phraseSearchInputValidator = async (
 ) => {
   await query("page", "Invalid page")
     .notEmpty()
-    .withMessage("page is empty")
+    .withMessage("page를 입력해주세요")
     .isNumeric()
-    .withMessage("page is not a number")
+    .withMessage("page를 숫자로만 입력해주세요")
     .run(req);
   await query("size", "Invalid size")
     .notEmpty()
-    .withMessage("size is empty")
+    .withMessage("size를 입력해주세요")
     .isNumeric()
-    .withMessage("size is not a number")
+    .withMessage("size를 숫자로만 입력해주세요")
     .run(req);
   await query("bookId", "Invalid book ID")
     .notEmpty()
-    .withMessage("book ID is empty")
+    .withMessage("bookId를 입력해주세요")
     .isNumeric()
-    .withMessage("book ID is not a number")
+    .withMessage("bookId를 숫자로만 입력해주세요")
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);

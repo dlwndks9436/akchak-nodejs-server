@@ -10,10 +10,10 @@ export const getLike = async (req: Request, res: Response) => {
       const rating = await Like.findOrCreate({
         where: { player_id: req.playerId, practicelog_id: practiceId },
         transaction: t,
+        raw: true,
       });
-      if (!rating) {
-        res.status(StatusCodes.NOT_FOUND).end();
-      }
+      console.log(rating);
+
       res.status(StatusCodes.OK).send(rating);
     });
   } catch (err) {
@@ -26,18 +26,17 @@ export const changeLike = async (req: Request, res: Response) => {
   try {
     await sequelize.transaction(async (t) => {
       const practiceId = req.params.practiceId;
-      const isLike = req.body.isLike;
-      const rating = await Like.update(
-        { is_like: isLike },
-        {
-          where: { player_id: req.playerId, practicelog_id: practiceId },
-          transaction: t,
-        }
-      );
-      if (!rating) {
+      const like = await Like.findOne({
+        where: { player_id: req.playerId, practicelog_id: practiceId },
+        transaction: t,
+      });
+      if (!like) {
         res.status(StatusCodes.NOT_FOUND).end();
+      } else {
+        like.is_like = !like.is_like;
+        const newLike = await like.save({ transaction: t });
+        res.status(StatusCodes.OK).send(newLike);
       }
-      res.status(StatusCodes.OK).send(rating);
     });
   } catch (err) {
     console.log(err);

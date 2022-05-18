@@ -15,7 +15,7 @@ import AWS from "aws-sdk";
 import { getPracticeLogsByType } from "../lib/functions/getPracticeLogsByType";
 import { Op } from "sequelize";
 import { sub, differenceInDays } from "date-fns";
-import { utcToZonedTime } from "date-fns-tz";
+import { getTimezoneOffset, utcToZonedTime } from "date-fns-tz";
 
 export const createPracticelog = async (req: Request, res: Response) => {
   try {
@@ -289,7 +289,10 @@ export const deletePracticelog = async (req: Request, res: Response) => {
 export const getRecentPracticeTime = async (req: Request, res: Response) => {
   try {
     const playerId = req.playerId;
-    const timezone = req.query.timezone;
+    const timezone = req.query.timezone as string;
+    if (getTimezoneOffset(timezone) === NaN) {
+      res.status(StatusCodes.NOT_ACCEPTABLE).end();
+    }
     const now = utcToZonedTime(new Date(), timezone as string);
     const result = new Array<number>(7).fill(0);
     const practicelogs = await PracticeLog.findAll({

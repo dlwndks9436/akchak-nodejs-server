@@ -4,7 +4,8 @@ import generateVerificationCode from "./generateVerificationCode";
 
 export const verificationCodeToEmail = async (
   playerId: number,
-  playerEmail: string
+  playerEmail: string,
+  playerUsername: string
 ): Promise<boolean> => {
   const verificationCode = generateVerificationCode(6);
   try {
@@ -15,14 +16,14 @@ export const verificationCodeToEmail = async (
       await previousVerificationCode
         .update({ code: verificationCode })
         .then(async () => {
-          await sendMail(playerEmail, verificationCode);
+          await sendMail(playerEmail, playerUsername, verificationCode);
         });
     } else {
       await VerificationCode.create({
         player_id: playerId,
         code: verificationCode,
       }).then(async () => {
-        await sendMail(playerEmail, verificationCode);
+        await sendMail(playerEmail, playerUsername, verificationCode);
       });
     }
   } catch (err) {

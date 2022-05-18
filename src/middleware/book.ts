@@ -30,15 +30,15 @@ export const bookSearchInputValidator = async (
 ) => {
   await query("page", "Invalid page")
     .notEmpty()
-    .withMessage("page is empty")
+    .withMessage("page를 입력해주세요")
     .isNumeric()
-    .withMessage("page is not a number")
+    .withMessage("page를 숫자로만 입력해주세요")
     .run(req);
   await query("size", "Invalid size")
     .notEmpty()
-    .withMessage("size is empty")
+    .withMessage("size를 입력해주세요")
     .isNumeric()
-    .withMessage("size is not a number")
+    .withMessage("size를 숫자로만 입력해주세요")
     .run(req);
   const result = validationResult(req);
   console.log("result: ", result);

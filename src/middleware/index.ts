@@ -1,7 +1,4 @@
 import {
-  verifyAccessToken,
-  verifyRefreshToken,
-  verifyVerificationCode,
   checkDuplicatedUsername,
   checkDuplicatedEmail,
   loginValidator,
@@ -15,6 +12,10 @@ import { phraseAddInputValidator, phraseSearchInputValidator } from "./phrase";
 import { bookInputValidator, bookSearchInputValidator } from "./book";
 
 import { musicInputValidator, musicSearchInputValidator } from "./music";
+
+import { verifyAccessToken, verifyRefreshToken } from "./jwtToken";
+
+import { verifyVerificationCode } from "./verificationCode";
 
 export {
   checkDuplicatedEmail,
