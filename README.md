@@ -104,8 +104,13 @@ https://akchak.com/api/docs/
 * express-validator를 middleware로 사용하여 http(s) request input type 검사
   * input validation 통과하면 http request를 controller로 보냄
   * input validation 에서 type error 발생하면 status code 400 (BAD REQUEST) response를 client로 보냄
-* date-fns 를 이용해서 데이터베이스에 utc 기준으로 저장되어 있는 datetime을 client의 timezone을 기준으로 제공할 수 있도록 함.
+* date-fns 를 이용해서 데이터베이스에 utc 기준으로 저장되어 있는 datetime을 client의 timezone을 기준으로 제공할 수 있도록 함
 * http-status-codes 를 이용해서 코드의 가독성을 높임
+* bcryptjs를 이용해서 비밀번호를 hashing하여 데이터베이스에 저장
+* jsonwebtoken을 이용해서 user authentication 구현
+  * 보안을 위해서 access token의 유효 사용기간이 짧을 수록 좋기 때문에 4시간 뒤에 expire 되도록함
+  * 1달 이내에 앱에 접속한 사용자는 로그인이 유지되도록 refresh token이 30일 뒤에 expire 되도록함
+  * refresh token의 expire time이 너무 길면 보안에 안좋은 것을 고려해서 access token이 바뀔 때마다 refresh token도 바뀌도록 함
 
 ## 구현해야하는 기능
 * tdd
