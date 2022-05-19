@@ -6,7 +6,7 @@
 
 ## 어플 체험해보기
 
-https://play.google.com/store/apps/details?id=com.juann.resonar
+https://play.google.com/store/apps/details?id=com.juann.akchak
 
 ## API Document 보기
 
