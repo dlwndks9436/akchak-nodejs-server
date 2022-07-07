@@ -4,6 +4,7 @@ import { sequelize } from "../model";
 import Phrase from "../model/phrase";
 import { Op } from "sequelize";
 import { getPagination } from "../lib/functions/getPagination";
+import Book from "../model/book";
 
 export const addPhrase = async (req: Request, res: Response) => {
   try {
@@ -42,6 +43,14 @@ export const getPhrases = async (req: Request, res: Response) => {
         title: { [Op.substring]: title as string },
         book_id: parseInt(bookId as string),
       },
+      include: [
+        {
+          model: Book,
+          required: true,
+          as: "book",
+          attributes: ["title"],
+        },
+      ],
       limit,
       offset,
       order: ["page", "title"],

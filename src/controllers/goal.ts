@@ -5,6 +5,7 @@ import { getPagination } from "../lib/functions/getPagination";
 import Music from "../model/music";
 import Phrase from "../model/phrase";
 import { Op } from "sequelize";
+import Book from "../model/book";
 
 export const addGoal = async (req: Request, res: Response) => {
   try {
@@ -54,9 +55,9 @@ export const getGoals = async (req: Request, res: Response) => {
             title: { [Op.substring]: title as string },
           },
         },
+        order: [["created_at", "DESC"]],
         limit,
         offset,
-        raw: true,
       });
     } else if (type === "교본") {
       totalGoals = await Goal.count({
@@ -67,15 +68,25 @@ export const getGoals = async (req: Request, res: Response) => {
       });
       goals = await Goal.findAll({
         where: { player_id: req.playerId, phrase_id: { [Op.gt]: 0 } },
-        include: {
-          model: Phrase,
-          where: {
-            title: { [Op.substring]: title as string },
+        include: [
+          {
+            model: Phrase,
+            where: {
+              title: { [Op.substring]: title as string },
+            },
+            include: [
+              {
+                model: Book,
+                required: true,
+                as: "book",
+                attributes: ["title"],
+              },
+            ],
           },
-        },
+        ],
+        order: [["created_at", "DESC"]],
         limit,
         offset,
-        raw: true,
       });
     }
     console.log(goals);

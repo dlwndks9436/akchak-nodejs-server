@@ -41,12 +41,12 @@ Phrase.init(
       comment: "교본 안에 있는 프레이즈의 고유번호",
     },
     title: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(40),
       allowNull: false,
       comment: "교본 안에 있는 프레이즈의 제목",
     },
     subheading: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(40),
       allowNull: false,
       comment: "교본 안에 있는 프레이즈의 부제목",
     },
